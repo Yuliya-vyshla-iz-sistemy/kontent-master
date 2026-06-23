@@ -49,6 +49,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 .ctrl-btn:hover{border-color:var(--terra);color:var(--terra);}
 .ctrl-btn.active{background:var(--eggplant);color:var(--cream);border-color:var(--eggplant);}
 [data-theme="dark"] .ctrl-btn.active{background:var(--amber);color:var(--graphite);border-color:var(--amber);}
+.back-btn{background:none;border:none;cursor:pointer;padding:4px 8px;color:var(--text-main);font-size:1.2em;line-height:1;border-radius:var(--radius-sm);transition:background .15s;}
+.back-btn:hover{background:var(--bg2);}
+.nav-item-instr{background:var(--surface2)!important;border-left:3px solid var(--terra)!important;color:var(--terra)!important;font-weight:700!important;margin-bottom:4px;}
+.nav-item-instr .nav-icon{font-size:1em;}
 .size-btn{width:30px;height:30px;padding:0;text-align:center;}
 .menu-toggle{display:none;width:36px;height:36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--text-main);font-size:1.2em;cursor:pointer;flex-shrink:0;margin-left:8px;align-items:center;justify-content:center;}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:199;}
@@ -238,7 +242,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 <aside class="sidebar" id="sidebar">
   <nav class="nav">
     <div class="nav-section">Главное</div>
-    <div class="nav-item" onclick="showPanel('instructions',this)" style="background:var(--surface2);border-left:3px solid var(--terra);color:var(--terra);font-weight:700;margin-bottom:4px"><span class="nav-icon">📖</span>Инструкция</div>
+    <div class="nav-item nav-item-instr" onclick="showPanel('instructions',this)"><span class="nav-icon">📖</span>Инструкция</div>
     <div class="nav-item active" onclick="showPanel('home',this)"><span class="nav-icon">✦</span>Главная</div>
     <div class="nav-section">Создать</div>
     <div class="nav-item" onclick="showPanel('occasions',this)"><span class="nav-icon">🗓️</span>Поводы для постов</div>
@@ -278,6 +282,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="showPanel('profile',navEl('profile'))">👤 Заполнить профиль</button>
         <button class="btn btn-secondary" onclick="showPanel('settings',navEl('settings'))">⚙️ Подключить AI</button>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn" onclick="showPanel('instructions',navEl('instructions'))" style="background:none;border:1.5px solid var(--terra);color:var(--terra);font-weight:600;padding:7px 16px;border-radius:20px;cursor:pointer;font-size:.85em">📖 Как пользоваться — Инструкция</button>
       </div>
     </div>
   </div>
@@ -1268,7 +1275,12 @@ function showPanel(id,el){
   if(btn)btn.style.display=(_navHistory.length>1&&id!=='home')?'inline-flex':'none';
 }
 function goBack(){
-  if(_navHistory.length>1){_navHistory.pop();const prev=_navHistory[_navHistory.length-1];const el=document.querySelector('.nav-item[onclick*=\'\'' +prev+'\'\'\']');showPanel(prev,el);}
+  if(_navHistory.length>1){
+    _navHistory.pop();
+    const prev=_navHistory[_navHistory.length-1];
+    const el=navEl(prev);
+    showPanel(prev,el);
+  }
 }
 function navEl(id){return document.querySelector('.nav-item[onclick*="\''+id+'\'"]');}
 
