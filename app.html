@@ -1240,7 +1240,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   <div class="footer-links">
     <a href="https://t.me/vyshla_iz_sistemy" target="_blank" class="footer-link">✈️ Telegram</a>
     <a href="https://vk.com/vyshla_iz_sistemy" target="_blank" class="footer-link">🔵 ВКонтакте</a>
-    <a href="https://max.ru/join/nXUHh4SsyMrkE6bHIWU5lYTx_XHq37CofWci7KRDeag" target="_blank" rel="noopener noreferrer" class="footer-link" onclick="window.open(this.href,'_blank');return false;">💬 Макс</a>
+    <a href="https://max.ru/join/nXUHh4SsyMrkE6bHIWU5lYTx_XHq37CofWci7KRDeag" class="footer-link" onclick="var u='https://max.ru/join/nXUHh4SsyMrkE6bHIWU5lYTx_XHq37CofWci7KRDeag';if(navigator.share){navigator.share({url:u})}else{window.open(u,'_system')||window.location.assign(u)};return false;">💬 Макс</a>
   </div>
 </footer>
 </main>
@@ -1257,7 +1257,7 @@ function setSize(s){document.documentElement.setAttribute('data-size',s);localSt
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
 
-let _navHistory=[];
+let _curPanel='home';
 function showPanel(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1269,18 +1269,12 @@ function showPanel(id,el){
   if(id==='occasions')initOccasions();
   document.querySelector('.content').scrollTo(0,0);
   closeSidebar();
-  // стек для кнопки «Назад»
-  if(!_navHistory.length||_navHistory[_navHistory.length-1]!==id){_navHistory.push(id);}
+  _curPanel=id;
   const btn=document.getElementById('backBtn');
-  if(btn)btn.style.display=(_navHistory.length>1&&id!=='home')?'inline-flex':'none';
+  if(btn)btn.style.display=(id!=='home')?'inline-flex':'none';
 }
 function goBack(){
-  if(_navHistory.length>1){
-    _navHistory.pop();
-    const prev=_navHistory[_navHistory.length-1];
-    const el=navEl(prev);
-    showPanel(prev,el);
-  }
+  showPanel('home',navEl('home'));
 }
 function navEl(id){return document.querySelector('.nav-item[onclick*="\''+id+'\'"]');}
 
