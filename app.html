@@ -618,6 +618,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
       <button class="btn btn-primary" id="btnRegenSlides" onclick="genSlides()"><span class="btn-text">🔄 Сгенерировать ещё раз</span><div class="spinner"></div></button>
       <button class="btn btn-amber" onclick="renderCanvasSlides()">🎨 Сделать картинки слайдов</button>
+      <button class="btn btn-secondary" id="btnDownloadAll" onclick="downloadAllSlides()" style="display:none">⬇ Скачать все ZIP</button>
       <button class="btn btn-secondary" onclick="cp('slidesText')">📋 Скопировать тексты</button>
     </div>
     <div style="font-size:.72em;color:var(--text-hint);margin-bottom:6px">✏️ Можно редактировать текст слайдов прямо здесь — формат: СЛАЙД N / заголовок / текст / разделитель ---</div>
@@ -1252,6 +1253,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 </main>
 </div>
 <div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const S={platform:'vk',template:'story',carType:'viral',funnel:'top',rwMode:'transcription',hookTone:'warm',criticMode:'full',reelsStruct:'twist',provider:'deepseek',imgProvider:'openai_img',selHook:null,slidesData:[],slideStyle:'minimal',photoOffset:38,slideTextMode:'full'};
 
@@ -2368,10 +2370,38 @@ async function renderCanvasSlides(){
     btn.onclick=(()=>{const c=canvas,n=i+1;return()=>dlCanvas(c,'slide-'+n);})();
     act.appendChild(btn);card.appendChild(canvas);card.appendChild(act);wrap.appendChild(card);
   }
+  const dlAllBtn=document.getElementById('btnDownloadAll');
+  if(dlAllBtn)dlAllBtn.style.display='inline-flex';
   toast('Готово: '+(styleNames[S.slideStyle]||'стиль')+'  ✓','ok');
 }
 
 function dlCanvas(canvas,name){const a=document.createElement('a');a.download=name+'.png';a.href=canvas.toDataURL('image/png');a.click();}
+
+async function downloadAllSlides(){
+  const canvases=document.querySelectorAll('#canvasSlides canvas');
+  if(!canvases.length){toast('Сначала сделай картинки слайдов','err');return;}
+  const btn=document.getElementById('btnDownloadAll');
+  if(btn){btn.textContent='⏳ Упаковываю...';btn.disabled=true;}
+  try{
+    const zip=new JSZip();
+    const folder=zip.folder('карусель');
+    canvases.forEach((canvas,i)=>{
+      const data=canvas.toDataURL('image/png').split(',')[1];
+      folder.file('слайд-'+(i+1)+'.png',data,{base64:true});
+    });
+    const blob=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='карусель.zip';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('ZIP скачан — '+canvases.length+' слайдов ✓','ok');
+  }catch(e){
+    toast('Ошибка упаковки: '+e.message,'err');
+  }finally{
+    if(btn){btn.textContent='⬇ Скачать все ZIP';btn.disabled=false;}
+  }
+}
 
 async function renderTypoCover(){
   if(!S.slidesData.length&&!S.selHook){toast('Сначала сгенерируй слайды','err');return;}
