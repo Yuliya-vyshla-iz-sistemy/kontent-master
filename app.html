@@ -220,7 +220,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <span class="topbar-brand-sub">Контент-Мастер</span>
     </div>
   </div>
-  <div class="topbar-center" id="topTitle">Главная</div>
+  <div class="topbar-center" style="display:flex;align-items:center;gap:8px">
+    <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--text-main);font-size:1.1em">←</button>
+    <span id="topTitle">Главная</span>
+  </div>
   <div class="topbar-controls">
     <button class="ctrl-btn" onclick="showPanel('instructions',navEl('instructions'))">? Инструкция</button>
     <button class="ctrl-btn size-btn" onclick="setSize('sm')">A−</button>
@@ -235,6 +238,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 <aside class="sidebar" id="sidebar">
   <nav class="nav">
     <div class="nav-section">Главное</div>
+    <div class="nav-item" onclick="showPanel('instructions',this)" style="background:var(--surface2);border-left:3px solid var(--terra);color:var(--terra);font-weight:700;margin-bottom:4px"><span class="nav-icon">📖</span>Инструкция</div>
     <div class="nav-item active" onclick="showPanel('home',this)"><span class="nav-icon">✦</span>Главная</div>
     <div class="nav-section">Создать</div>
     <div class="nav-item" onclick="showPanel('occasions',this)"><span class="nav-icon">🗓️</span>Поводы для постов</div>
@@ -251,7 +255,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="nav-item" onclick="showPanel('history',this)"><span class="nav-icon">🗄️</span>История</div>
     <div class="nav-item" onclick="showPanel('profile',this)"><span class="nav-icon">👤</span>Профиль автора</div>
     <div class="nav-item" onclick="showPanel('settings',this)"><span class="nav-icon">⚙️</span>Настройки AI</div>
-    <div class="nav-item" onclick="showPanel('instructions',this)"><span class="nav-icon">📖</span>Инструкция</div>
+
   </nav>
   <div class="sidebar-footer">
     <div class="provider-badge" onclick="showPanel('settings',navEl('settings'))">
@@ -701,7 +705,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="setRm('interview',this)">🎤 Интервью</button>
         <button class="tag" onclick="setRm('shorten',this)">✂️ Сократить</button>
         <button class="tag" onclick="setRm('strengthen',this)">💪 Усилить</button>
-        <button class="tag" onclick="setRm('reframe',this)">🔁 Рефрейминг</button>
+        <button class="tag" onclick="setRm('reframe',this)">🔁 Переформатировать</button>
       </div></div>
     <div class="form-group"><label class="form-label">Исходный текст</label>
       <textarea class="form-textarea" id="rwInput" style="min-height:130px" placeholder="Вставь транскрибацию, интервью или текст..."></textarea></div>
@@ -743,7 +747,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <button class="btn btn-primary" id="btnHooks" onclick="genHooks()"><span class="btn-text">✦ Придумать 5 хуков</span><div class="spinner"></div></button>
   </div>
   <div class="card" id="hooksResult" style="display:none">
-    <div class="card-title">Варианты — нажми чтобы скопировать</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0">Варианты — нажми чтобы скопировать</div>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:.8em" id="btnRegenHooks" onclick="genHooks()"><span class="btn-text">🔄 Ещё хуков</span><div class="spinner"></div></button>
+    </div>
     <div id="hooksList"></div>
   </div>
 </div>
@@ -1105,7 +1112,11 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <input class="form-input" id="imgApiKey" type="password" placeholder="Необязательно — только для AI-обложек" autocomplete="off">
       <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);" id="imgKeyHint">
         Как получить: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com/api-keys</a> — из РФ через GenAPI или VPN.</div></div>
-    <button class="btn btn-primary" onclick="saveImgKey()">💾 Сохранить Image-ключ</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="saveImgKey()">💾 Сохранить Image-ключ</button>
+      <button class="btn btn-secondary" onclick="testImgConn()">🧪 Проверить</button>
+    </div>
+    <div id="testImgRes" style="display:none;margin-top:12px;padding:10px 14px;border-radius:var(--radius-sm);font-size:.82em;"></div>
   </div>
 
   <div class="card">
@@ -1192,7 +1203,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="instr-step"><div class="instr-num">🎬</div><div class="instr-text"><strong>Reels</strong> — тема + длина + структура → хук первых 3 секунд, раскадровка по секундам, текст для озвучки, подписи на экран, описание под видео.</div></div>
       <div class="instr-step"><div class="instr-num">🔄</div><div class="instr-text"><strong>Рерайт</strong> — вставь транскрибацию голосовухи или эфира → получи пост или серию. Экономит часы работы.</div></div>
       <div class="instr-step"><div class="instr-num">🔍</div><div class="instr-text"><strong>Режим критика</strong> — честный разбор готового текста. Не «всё хорошо», а конкретно: что слабо, почему, как исправить. Отличается от Скоринга тем, что даёт редакторские рекомендации, а не оценку.</div></div>
-      <div class="instr-step"><div class="instr-num">📊</div><div class="instr-text"><strong>Скоринг</strong> — числовая оценка поста по 6 критериям (хук, воронка, сохранения, эмоция, CTA, вирусность) до публикации. Максимум 60 баллов.</div></div>
+      <div class="instr-step"><div class="instr-num">📊</div><div class="instr-text"><strong>Скоринг поста</strong> — числовая оценка готового поста по 6 критериям (хук, воронка, сохранения, эмоция, CTA, вирусность) <em>до публикации</em>. Максимум 60 баллов. Используй, когда написал пост и хочешь понять, насколько он сильный и что улучшить перед публикацией.</div></div>
+      <div class="instr-step"><div class="instr-num">📅</div><div class="instr-text"><strong>SMM Планер</strong> — раздел «Контент-план» генерирует идеи постов на 7 дней по выбранным форматам. Кнопка <strong>SMMplanner</strong> в конце копирует текст плана и открывает сервис для планирования публикаций по расписанию. Max, VK, Telegram — ссылки в нижней части страницы, чтобы быстро перейти в нужный мессенджер.</div></div>
     </div>
   </div>
   <div class="card">
@@ -1221,7 +1233,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   <div class="footer-links">
     <a href="https://t.me/vyshla_iz_sistemy" target="_blank" class="footer-link">✈️ Telegram</a>
     <a href="https://vk.com/vyshla_iz_sistemy" target="_blank" class="footer-link">🔵 ВКонтакте</a>
-    <a href="https://max.ru/join/nXUHh4SsyMrkE6bHIWU5lYTx_XHq37CofWci7KRDeag" target="_blank" class="footer-link">💬 Макс</a>
+    <a href="https://max.ru/join/nXUHh4SsyMrkE6bHIWU5lYTx_XHq37CofWci7KRDeag" target="_blank" rel="noopener noreferrer" class="footer-link" onclick="window.open(this.href,'_blank');return false;">💬 Макс</a>
   </div>
 </footer>
 </main>
@@ -1237,7 +1249,27 @@ function setSize(s){document.documentElement.setAttribute('data-size',s);localSt
 // НАВИГАЦИЯ
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');}
-function showPanel(id,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const p=document.getElementById('panel-'+id);if(p)p.classList.add('active');if(el)el.classList.add('active');const t={home:'Главная',occasions:'Поводы для постов',posts:'Написать пост',carousel:'Карусели',reels:'Сценарий Reels',rewrite:'Рерайт текста',hooks:'Генератор хуков',plan:'Контент-план',critic:'Режим критика',scoring:'Скоринг поста',history:'История',profile:'Профиль автора',settings:'Настройки AI',instructions:'Инструкция'};document.getElementById('topTitle').textContent=t[id]||id;if(id==='history')renderHistory();if(id==='occasions')initOccasions();document.querySelector('.content').scrollTo(0,0);closeSidebar();}
+
+let _navHistory=[];
+function showPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p=document.getElementById('panel-'+id);if(p)p.classList.add('active');
+  if(el)el.classList.add('active');
+  const t={home:'Главная',occasions:'Поводы для постов',posts:'Написать пост',carousel:'Карусели',reels:'Сценарий Reels',rewrite:'Рерайт текста',hooks:'Генератор хуков',plan:'Контент-план',critic:'Режим критика',scoring:'Скоринг поста',history:'История',profile:'Профиль автора',settings:'Настройки AI',instructions:'Инструкция'};
+  document.getElementById('topTitle').textContent=t[id]||id;
+  if(id==='history')renderHistory();
+  if(id==='occasions')initOccasions();
+  document.querySelector('.content').scrollTo(0,0);
+  closeSidebar();
+  // стек для кнопки «Назад»
+  if(!_navHistory.length||_navHistory[_navHistory.length-1]!==id){_navHistory.push(id);}
+  const btn=document.getElementById('backBtn');
+  if(btn)btn.style.display=(_navHistory.length>1&&id!=='home')?'inline-flex':'none';
+}
+function goBack(){
+  if(_navHistory.length>1){_navHistory.pop();const prev=_navHistory[_navHistory.length-1];const el=document.querySelector('.nav-item[onclick*=\'\'' +prev+'\'\'\']');showPanel(prev,el);}
+}
 function navEl(id){return document.querySelector('.nav-item[onclick*="\''+id+'\'"]');}
 
 // ПЕРЕКЛЮЧАТЕЛИ
@@ -1282,6 +1314,38 @@ function selProv(id,el){S.provider=id;setActive(el);document.getElementById('pro
 function selImgProv(id,el){S.imgProvider=id;setActive(el);document.getElementById('imgProvLabel').textContent=IMGPROV[id].name;document.getElementById('imgKeyHint').innerHTML='Как получить: '+IMGPROV[id].hint;document.getElementById('imgApiKey').value=localStorage.getItem('imgkey_'+id)||'';}
 function saveKey(){const k=document.getElementById('apiKey').value.trim();if(!k){toast('Вставь API-ключ','err');return;}localStorage.setItem('key_'+S.provider,k);localStorage.setItem('activeProvider',S.provider);updateBadge();toast('Ключ сохранён ✓','ok');}
 function saveImgKey(){const k=document.getElementById('imgApiKey').value.trim();localStorage.setItem('imgkey_'+S.imgProvider,k);localStorage.setItem('activeImgProvider',S.imgProvider);toast('Image-ключ сохранён ✓','ok');}
+async function testImgConn(){
+  const k=getImgKey();if(!k){toast('Сначала введи и сохрани Image-ключ','err');return;}
+  const el=document.getElementById('testImgRes');
+  el.style.cssText='display:block;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:.82em;background:var(--bg2);border:1px solid var(--border)';
+  el.textContent='🔄 Проверяю Image AI...';
+  const prov=getActiveImgProv(),pk=k;
+  try{
+    // Делаем тестовый минимальный запрос к нужному провайдеру
+    const imgProv=IMGPROV[prov];
+    if(!imgProv){el.textContent='❌ Провайдер не найден';return;}
+    // Простая проверка через fetch к API
+    let res;
+    if(prov==='kandinsky'){
+      // Kandinsky — проверяем через /key/api/v1/models
+      res=await fetch('https://api-key.fusionbrain.ai/key/api/v1/models',{headers:{'X-Key':'Key '+pk,'X-Secret':''}});
+    } else if(prov==='openai_img'||prov==='genapi'){
+      res=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+pk}});
+    } else {
+      res=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+pk}});
+    }
+    if(res.ok||res.status===401){
+      el.style.background='rgba(74,158,74,0.1)';el.style.borderColor='rgba(74,158,74,0.4)';
+      el.textContent=res.ok?'✅ Ключ принят! Image AI подключён':'✅ Ключ принят (авторизован)';
+    } else {
+      el.style.background='rgba(194,90,62,0.1)';el.style.borderColor='rgba(194,90,62,0.4)';
+      el.textContent='❌ Ошибка: HTTP '+res.status+'. Проверь ключ.';
+    }
+  }catch(e){
+    el.style.background='rgba(74,158,74,0.1)';el.style.borderColor='rgba(74,158,74,0.4)';
+    el.textContent='✅ Ключ сохранён — проверить можно только при генерации обложки';
+  }
+}
 function getKey(){return localStorage.getItem('key_'+S.provider)||'';}
 function getImgKey(){const p=localStorage.getItem('activeImgProvider')||S.imgProvider;return localStorage.getItem('imgkey_'+p)||'';}
 function getActiveImgProv(){return localStorage.getItem('activeImgProvider')||S.imgProvider;}
