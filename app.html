@@ -188,8 +188,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   .topbar-brand-sub{display:none;}
   .topbar-center{padding:0 8px;font-size:.92em;}
   .topbar-controls{gap:4px;}
-  .topbar-controls .ctrl-btn:not(.size-btn) .btn-label{display:none;}
-  .topbar-controls .ctrl-btn:not(.size-btn){padding:0 8px;min-width:32px;}
+  .topbar-controls .ctrl-btn:not(.size-btn){display:none;}
+  .topbar-controls #themeBtn{display:inline-flex;padding:0 8px;min-width:32px;}
+  .size-btn[onclick*="md"]{display:none;}
   .menu-toggle{display:flex;}
 
   .sidebar{position:fixed;top:52px;left:0;bottom:0;z-index:200;transform:translateX(-100%);transition:transform .2s ease;box-shadow:var(--shadow-md);}
