@@ -188,7 +188,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   .topbar-brand-sub{display:none;}
   .topbar-center{padding:0 8px;font-size:.92em;}
   .topbar-controls{gap:4px;}
-  .topbar-controls .ctrl-btn:not(.size-btn){display:none;}
+  .topbar-controls .ctrl-btn:not(.size-btn) .btn-label{display:none;}
+  .topbar-controls .ctrl-btn:not(.size-btn){padding:0 8px;min-width:32px;}
   .menu-toggle{display:flex;}
 
   .sidebar{position:fixed;top:52px;left:0;bottom:0;z-index:200;transform:translateX(-100%);transition:transform .2s ease;box-shadow:var(--shadow-md);}
@@ -210,7 +211,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 @media(max-width:420px){
   .quick-grid{grid-template-columns:1fr;}
   .topbar-brand-name{font-size:.75em;}
-  .ctrl-btn.size-btn{display:none;}
 }
 </style>
 </head>
@@ -233,7 +233,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <button class="ctrl-btn size-btn" onclick="setSize('sm')">A−</button>
     <button class="ctrl-btn size-btn active" onclick="setSize('md')">A</button>
     <button class="ctrl-btn size-btn" onclick="setSize('lg')">A+</button>
-    <button class="ctrl-btn" onclick="toggleTheme()" id="themeBtn">🌙 Тёмная</button>
+    <button class="ctrl-btn" onclick="toggleTheme()" id="themeBtn" title="Тема">🌙</button>
   </div>
   <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()" aria-label="Меню разделов">☰</button>
 </header>
@@ -309,7 +309,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 
   <!-- ВКЛАДКИ -->
   <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)">
-    <button id="tab-events" class="occ-tab active" onclick="switchOccTab('events',this)" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid var(--terra);margin-bottom:-2px;color:var(--terra);font-weight:600;font-size:.9em;cursor:pointer;font-family:Manrope,sans-serif">📅 События и праздники</button>
+    <button id="tab-events" class="occ-tab active" onclick="switchOccTab('events',this)" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid var(--terra);margin-bottom:-2px;color:var(--terra);font-weight:600;font-size:.9em;cursor:pointer;font-family:Manrope,sans-serif"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> События и праздники</button>
     <button id="tab-news" class="occ-tab" onclick="switchOccTab('news',this)" style="flex:1;padding:10px 0;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-muted);font-weight:500;font-size:.9em;cursor:pointer;font-family:Manrope,sans-serif">📰 Новости по нише</button>
   </div>
 
@@ -317,7 +317,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   <div id="occ-events">
     <div class="card">
       <div class="accent-line"></div>
-      <div class="card-title">📅 События и праздники</div>
+      <div class="card-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> События и праздники</div>
       <div class="card-desc">Найди актуальные поводы для постов — праздники, мемные даты, бизнес-события</div>
 
       <div class="form-group" style="margin-top:14px">
@@ -383,7 +383,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <textarea id="evtPersonal" class="form-input" rows="3" placeholder="Например: 09.02 — день рождения"></textarea>
       </div>
 
-      <button class="btn btn-primary" id="btnGenEvents" onclick="genEvents()"><span class="btn-text">📅 Собрать события</span><div class="spinner"></div></button>
+      <button class="btn btn-primary" id="btnGenEvents" onclick="genEvents()"><span class="btn-text"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Собрать события</span><div class="spinner"></div></button>
     </div>
 
     <div id="eventsResult" style="display:none;margin-top:16px"></div>
@@ -483,7 +483,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="card-title">Результат</div>
     <div class="result-box" id="postText"></div>
     <div class="result-actions">
-      <button class="btn btn-secondary" onclick="cp('postText')">📋 Скопировать</button>
+      <button class="btn btn-secondary" onclick="cp('postText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
       <button class="btn btn-secondary" onclick="genPost()">🔄 Ещё вариант</button>
       <button class="btn btn-secondary" onclick="genPost(true)">📱 Адаптировать под все 3 платформы</button>
       <button class="btn btn-amber" onclick="openPosterModal()" id="btnOpenPoster">🎨 Постер к тексту</button>
@@ -505,7 +505,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="selPosterStyle('watercolor',this)">🎨 Акварель</button>
         <button class="tag" onclick="selPosterStyle('illustration',this)">✏️ Иллюстрация</button>
         <button class="tag" onclick="selPosterStyle('oil',this)">🖼 Масло</button>
-        <button class="tag" onclick="selPosterStyle('popart',this)">🎯 Поп-арт</button>
+        <button class="tag" onclick="selPosterStyle('popart',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Поп-арт</button>
         <button class="tag" onclick="selPosterStyle('flat',this)">📐 Флэт-дизайн</button>
         <button class="tag" onclick="selPosterStyle('minimal',this)">◻️ Минимализм</button>
         <button class="tag" onclick="selPosterStyle('3d',this)">💎 3D рендер</button>
@@ -648,7 +648,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="selCoverStyle('watercolor',this)">🎨 Акварель</button>
         <button class="tag" onclick="selCoverStyle('illustration',this)">✏️ Иллюстрация</button>
         <button class="tag" onclick="selCoverStyle('oil',this)">🖼 Масло</button>
-        <button class="tag" onclick="selCoverStyle('popart',this)">🎯 Поп-арт</button>
+        <button class="tag" onclick="selCoverStyle('popart',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Поп-арт</button>
         <button class="tag" onclick="selCoverStyle('flat',this)">📐 Флэт-дизайн</button>
         <button class="tag" onclick="selCoverStyle('minimal',this)">◻️ Минимализм</button>
         <button class="tag" onclick="selCoverStyle('3d',this)">💎 3D рендер</button>
@@ -701,7 +701,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="card-title">Сценарий</div>
     <div class="result-box" id="reelsText" style="min-height:160px"></div>
     <div class="result-actions">
-      <button class="btn btn-secondary" onclick="cp('reelsText')">📋 Скопировать</button>
+      <button class="btn btn-secondary" onclick="cp('reelsText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
     </div>
   </div>
 </div>
@@ -735,7 +735,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="card-title">Результат</div>
     <div class="result-box" id="rwText"></div>
     <div class="result-actions">
-      <button class="btn btn-secondary" onclick="cp('rwText')">📋 Скопировать</button>
+      <button class="btn btn-secondary" onclick="cp('rwText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
     </div>
   </div>
 </div>
@@ -753,7 +753,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag active" onclick="setHt('warm',this)">🤗 Тёплая</button>
         <button class="tag" onclick="setHt('bold',this)">💥 Дерзкая</button>
         <button class="tag" onclick="setHt('story',this)">📖 Сторителлинг</button>
-        <button class="tag" onclick="setHt('expert',this)">🎯 Экспертная</button>
+        <button class="tag" onclick="setHt('expert',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Экспертная</button>
         <button class="tag" onclick="setHt('provoke',this)">🔥 Провокация</button>
       </div></div>
     <button class="btn btn-primary" id="btnHooks" onclick="genHooks()"><span class="btn-text">✦ Придумать 5 хуков</span><div class="spinner"></div></button>
@@ -792,14 +792,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       </div>
       <div style="font-size:.74em;color:var(--text-hint);margin-top:4px">Отмечены только нужные — AI включит только их в план</div>
     </div>
-    <button class="btn btn-primary" id="btnPlan" onclick="genPlan()"><span class="btn-text">📅 Сгенерировать план</span><div class="spinner"></div></button>
+    <button class="btn btn-primary" id="btnPlan" onclick="genPlan()"><span class="btn-text"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Сгенерировать план</span><div class="spinner"></div></button>
   </div>
   <div class="card" id="planResult" style="display:none">
     <div class="card-title">План на неделю</div>
     <div id="planHtml" style="font-size:.86em;line-height:1.75;color:var(--text-main)"></div>
     <div class="result-actions" style="margin-top:12px">
-      <button class="btn btn-secondary" onclick="cp('planHtml')">📋 Скопировать</button>
-      <a href="https://postmypost.io/" target="_blank" class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('planHtml').innerText)">📅 SMMplanner</a>
+      <button class="btn btn-secondary" onclick="cp('planHtml')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
+      <a href="https://postmypost.io/" target="_blank" class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('planHtml').innerText)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> SMMplanner</a>
     </div>
   </div>
 </div>
@@ -813,14 +813,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="form-group">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <label class="form-label">Текст для разбора</label>
-        <button class="btn btn-secondary" style="font-size:.72em;padding:3px 10px" onclick="clearCritic()">🗑 Очистить</button>
+        <button class="btn btn-secondary" style="font-size:.72em;padding:3px 10px" onclick="clearCritic()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Очистить</button>
       </div>
       <textarea class="form-textarea" id="criticInput" style="min-height:140px" placeholder="Вставь пост, хук, описание карусели..."></textarea></div>
     <div class="form-group"><label class="form-label">Фокус</label>
       <div class="tag-group">
         <button class="tag active" onclick="setCm('full',this)">🔍 Полный разбор</button>
         <button class="tag" onclick="setCm('hook',this)">🪝 Только хук</button>
-        <button class="tag" onclick="setCm('cta',this)">🎯 Только CTA</button>
+        <button class="tag" onclick="setCm('cta',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Только CTA</button>
         <button class="tag" onclick="setCm('cliche',this)">🚫 Клише и шаблоны</button>
         <button class="tag" onclick="setCm('emotion',this)">❤️ Эмоции и тон</button>
         <button class="tag" onclick="setCm('structure',this)">📐 Структура</button>
@@ -831,7 +831,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="card-title">Разбор критика</div>
     <div class="result-box" id="criticText"></div>
     <div class="result-actions">
-      <button class="btn btn-secondary" onclick="cp('criticText')">📋 Скопировать</button>
+      <button class="btn btn-secondary" onclick="cp('criticText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
       <button class="btn btn-primary" onclick="applyFix()">✦ Исправить автоматически</button>
     </div>
   </div>
@@ -1145,7 +1145,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 
 <div class="panel" id="panel-instructions">
   <div class="card"><div class="accent-line"></div>
-    <div class="card-title" style="font-size:1.2em">📖 Инструкция</div>
+    <div class="card-title" style="font-size:1.2em"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Инструкция</div>
     <div class="card-desc">Прочитай один раз — займёт 5 минут. После этого всё будет понятно.</div>
   </div>
   <div class="card">
@@ -1168,7 +1168,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <tr><td><strong>OpenAI</strong></td><td><a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a></td><td>⚠️ VPN/GenAPI</td><td>По токенам</td></tr>
         <tr><td><strong>Gemini</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Лимит бесплатно</td></tr>
       </table>
-      <div class="instr-tip">💡 <strong>Из РФ нет доступа к OpenAI/Claude/Gemini?</strong> Зарегистрируйся на <a href="https://gen-api.ru" target="_blank" class="instr-link">GenAPI.ru</a> — один ключ даёт все модели, оплата рублями.</div>
+      <div class="instr-tip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> <strong>Из РФ нет доступа к OpenAI/Claude/Gemini?</strong> Зарегистрируйся на <a href="https://gen-api.ru" target="_blank" class="instr-link">GenAPI.ru</a> — один ключ даёт все модели, оплата рублями.</div>
     </div>
     <div class="divider"></div>
     <div class="instr-section">
@@ -1192,12 +1192,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <tr><td><strong>GenAPI.ru</strong></td><td><a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a></td><td>✅ Рубли</td><td>Midjourney, DALL·E, Flux — всё в одном</td></tr>
         <tr><td><strong>Kandinsky</strong></td><td><a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a></td><td>✅ Рубли</td><td>Бесплатный лимит ~100 запросов/день</td></tr>
       </table>
-      <div class="instr-tip">🎨 <strong>Гибридная генерация:</strong> типографские слайды рисуются мгновенно в браузере в твоих цветах — это база, которая работает всегда. AI-обложка — бонус сверху. Если AI не сработал → автоматически делается типографская обложка.</div>
+      <div class="instr-tip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> <strong>Гибридная генерация:</strong> типографские слайды рисуются мгновенно в браузере в твоих цветах — это база, которая работает всегда. AI-обложка — бонус сверху. Если AI не сработал → автоматически делается типографская обложка.</div>
     </div>
     <div class="divider"></div>
     <div class="instr-section">
       <div class="instr-h2">Шаг 3 — Заполни профиль автора</div>
-      <div class="instr-tip">🎯 Это самое важное. Без профиля AI пишет «как все». С профилем — пишет как <strong>ты</strong>. Чем подробнее — тем точнее.</div>
+      <div class="instr-tip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Это самое важное. Без профиля AI пишет «как все». С профилем — пишет как <strong>ты</strong>. Чем подробнее — тем точнее.</div>
       <div class="instr-step"><div class="instr-num">1</div><div class="instr-text">Открой <strong>Профиль автора</strong> в меню слева</div></div>
       <div class="instr-step"><div class="instr-num">2</div><div class="instr-text">Заполни имя, @ник, нишу, тон, аудиторию, фирменные фразы</div></div>
       <div class="instr-step"><div class="instr-num">3</div><div class="instr-text">Добавь <strong>продукты</strong> — название + описание + ссылка. Ссылка автоматически вставляется в CTA постов и каруселей</div></div>
@@ -1210,13 +1210,13 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="divider"></div>
     <div class="instr-section">
       <div class="instr-h2">Шаг 4 — Создавай контент</div>
-      <div class="instr-step"><div class="instr-num">✍️</div><div class="instr-text"><strong>Посты</strong> — платформа + тема + структура → «Сгенерировать». Кнопка «Адаптировать под все 3 платформы» даёт три варианта сразу.</div></div>
-      <div class="instr-step"><div class="instr-num">🎠</div><div class="instr-text"><strong>Карусели</strong> → AI предлагает 5 хуков → выбираешь → получаешь тексты слайдов → «Сделать картинки» рисует слайды в браузере в твоих цветах за секунды → скачиваешь PNG. Режим «По сценарию» — вставляешь готовый текст, AI только оформляет.</div></div>
-      <div class="instr-step"><div class="instr-num">🎬</div><div class="instr-text"><strong>Reels</strong> — тема + длина + структура → хук первых 3 секунд, раскадровка по секундам, текст для озвучки, подписи на экран, описание под видео.</div></div>
-      <div class="instr-step"><div class="instr-num">🔄</div><div class="instr-text"><strong>Рерайт</strong> — вставь транскрибацию голосовухи или эфира → получи пост или серию. Экономит часы работы.</div></div>
-      <div class="instr-step"><div class="instr-num">🔍</div><div class="instr-text"><strong>Режим критика</strong> — честный разбор готового текста. Не «всё хорошо», а конкретно: что слабо, почему, как исправить. Отличается от Скоринга тем, что даёт редакторские рекомендации, а не оценку.</div></div>
-      <div class="instr-step"><div class="instr-num">📊</div><div class="instr-text"><strong>Скоринг поста</strong> — числовая оценка готового поста по 6 критериям (хук, воронка, сохранения, эмоция, CTA, вирусность) <em>до публикации</em>. Максимум 60 баллов. Используй, когда написал пост и хочешь понять, насколько он сильный и что улучшить перед публикацией.</div></div>
-      <div class="instr-step"><div class="instr-num">📅</div><div class="instr-text"><strong>SMM Планер</strong> — раздел «Контент-план» генерирует идеи постов на 7 дней по выбранным форматам. Кнопка <strong>SMMplanner</strong> в конце копирует текст плана и открывает сервис для планирования публикаций по расписанию. Max, VK, Telegram — ссылки в нижней части страницы, чтобы быстро перейти в нужный мессенджер.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div><div class="instr-text"><strong>Посты</strong> — платформа + тема + структура → «Сгенерировать». Кнопка «Адаптировать под все 3 платформы» даёт три варианта сразу.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div><div class="instr-text"><strong>Карусели</strong> → AI предлагает 5 хуков → выбираешь → получаешь тексты слайдов → «Сделать картинки» рисует слайды в браузере в твоих цветах за секунды → скачиваешь PNG. Режим «По сценарию» — вставляешь готовый текст, AI только оформляет.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 3.8"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></div><div class="instr-text"><strong>Reels</strong> — тема + длина + структура → хук первых 3 секунд, раскадровка по секундам, текст для озвучки, подписи на экран, описание под видео.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></div><div class="instr-text"><strong>Рерайт</strong> — вставь транскрибацию голосовухи или эфира → получи пост или серию. Экономит часы работы.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div><div class="instr-text"><strong>Режим критика</strong> — честный разбор готового текста. Не «всё хорошо», а конкретно: что слабо, почему, как исправить. Отличается от Скоринга тем, что даёт редакторские рекомендации, а не оценку.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="instr-text"><strong>Скоринг поста</strong> — числовая оценка готового поста по 6 критериям (хук, воронка, сохранения, эмоция, CTA, вирусность) <em>до публикации</em>. Максимум 60 баллов. Используй, когда написал пост и хочешь понять, насколько он сильный и что улучшить перед публикацией.</div></div>
+      <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="instr-text"><strong>SMM Планер</strong> — раздел «Контент-план» генерирует идеи постов на 7 дней по выбранным форматам. Кнопка <strong>SMMplanner</strong> в конце копирует текст плана и открывает сервис для планирования публикаций по расписанию. Max, VK, Telegram — ссылки в нижней части страницы, чтобы быстро перейти в нужный мессенджер.</div></div>
     </div>
   </div>
   <div class="card">
@@ -1255,7 +1255,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 const S={platform:'vk',template:'story',carType:'viral',funnel:'top',rwMode:'transcription',hookTone:'warm',criticMode:'full',reelsStruct:'twist',provider:'deepseek',imgProvider:'openai_img',selHook:null,slidesData:[],slideStyle:'minimal',photoOffset:38,slideTextMode:'full'};
 
 // ТЕМА
-function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark',n=d?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.getElementById('themeBtn').textContent=d?'🌙 Тёмная':'☀️ Светлая';document.querySelectorAll('.logo-light').forEach(e=>e.style.display=d?'block':'none');document.querySelectorAll('.logo-dark').forEach(e=>e.style.display=d?'none':'block');}
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark',n=d?'light':'dark';h.setAttribute('data-theme',n);localStorage.setItem('theme',n);document.getElementById('themeBtn').textContent=d?'🌙':'☀️';document.querySelectorAll('.logo-light').forEach(e=>e.style.display=d?'block':'none');document.querySelectorAll('.logo-dark').forEach(e=>e.style.display=d?'none':'block');}
 function setSize(s){document.documentElement.setAttribute('data-size',s);localStorage.setItem('size',s);const l={sm:'A−',md:'A',lg:'A+'};document.querySelectorAll('.size-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===l[s]));}
 
 // НАВИГАЦИЯ
@@ -1611,7 +1611,7 @@ ${personal}` : ''}
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div style="font-family:Spectral,serif;font-size:1em;font-weight:700;color:var(--eggplant)">Найдено: ${events.length} событий</div>
-          <button class="btn btn-secondary" style="font-size:.75em;padding:4px 10px" onclick="document.getElementById('eventsResult').innerHTML='';document.getElementById('eventsResult').style.display='none'">🗑 Очистить</button>
+          <button class="btn btn-secondary" style="font-size:.75em;padding:4px 10px" onclick="document.getElementById('eventsResult').innerHTML='';document.getElementById('eventsResult').style.display='none'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Очистить</button>
         </div>
         <div id="eventsList"></div>
       </div>`;
@@ -1694,7 +1694,7 @@ ${extra ? 'Дополнительные темы: '+extra : ''}
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <div style="font-family:Spectral,serif;font-size:1em;font-weight:700;color:var(--eggplant)">Найдено: ${news.length} новостей</div>
-          <button class="btn btn-secondary" style="font-size:.75em;padding:4px 10px" onclick="document.getElementById('newsResult').innerHTML='';document.getElementById('newsResult').style.display='none'">🗑 Очистить</button>
+          <button class="btn btn-secondary" style="font-size:.75em;padding:4px 10px" onclick="document.getElementById('newsResult').innerHTML='';document.getElementById('newsResult').style.display='none'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Очистить</button>
         </div>
         <div id="newsList"></div>
       </div>`;
@@ -2664,7 +2664,7 @@ function renderPlanHtml(text){
 (function init(){
   const theme=localStorage.getItem('theme')||'light';
   document.documentElement.setAttribute('data-theme',theme);
-  document.getElementById('themeBtn').textContent=theme==='dark'?'☀️ Светлая':'🌙 Тёмная';
+  document.getElementById('themeBtn').textContent=theme==='dark'?'☀️':'🌙';
   document.querySelectorAll('.logo-light').forEach(e=>e.style.display=theme==='dark'?'none':'block');
   document.querySelectorAll('.logo-dark').forEach(e=>e.style.display=theme==='dark'?'block':'none');
   const sz=localStorage.getItem('size')||'md';
