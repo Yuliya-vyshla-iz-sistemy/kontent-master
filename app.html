@@ -1566,11 +1566,11 @@ async function _kmHandlePaymentReturn(paymentId, tier){
     const resp=await fetch(KM_VERIFY,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
-      body:JSON.stringify({payment_id:paymentId,tier})
+      body:JSON.stringify({paymentId:paymentId,userEmail:_kmUser.email,tier})
     });
     const json=await resp.json();
     history.replaceState(null,'',window.location.pathname);
-    if(json.ok){
+   if(json.success){
       _kmTier=tier; _kmPaid=true;
       _kmUpdateUI(); _kmShowDemoBanner();
       const lbl={basic:'Базовый',pro:'Про',annual:'Про (год)'}[tier]||tier;
