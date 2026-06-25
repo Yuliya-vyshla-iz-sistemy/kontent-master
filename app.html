@@ -1473,7 +1473,7 @@ function _kmShowDemoBanner(){
       if(!document.getElementById('km-demo-end-bar')){
         const el=document.createElement('div');
         el.id='km-demo-end-bar';
-        el.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--amber);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:500;gap:12px;flex-wrap:wrap';
+        el.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--amber);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:;9999gap:12px;flex-wrap:wrap';
         el.innerHTML='<span style="font-size:.81rem;color:var(--text-muted)">🔒 <b style="color:var(--amber)">Демо-лимит исчерпан.</b> Для продолжения нужна подписка.</span><button onclick="openPaywall()" style="background:var(--terra);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-family:var(--font-display);font-weight:700;cursor:pointer;font-size:.82rem">Открыть тарифы</button>';
         document.body.appendChild(el);
       }
