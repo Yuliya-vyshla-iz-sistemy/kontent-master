@@ -1544,6 +1544,7 @@ async function startPaymentKM(tier){
     const json=await resp.json();
     if(json.confirmation_url){
       document.getElementById('pay-loading').textContent='✅ Перехожу к оплате...';
+      localStorage.setItem('km_pending_payment_id', json.paymentId);
       setTimeout(()=>{ window.location.href=json.confirmation_url; },800);
     } else {
       document.getElementById('pay-loading').textContent='❌ Ошибка: '+(json.error||'неизвестно');
