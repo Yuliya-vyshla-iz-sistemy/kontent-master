@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru" data-theme="light" data-size="md">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">fif(json.confirmation_url){
+      document.getElementById('pay-loading').textContent='✅ Перехожу к оплате...';
+      localStorage.setItem('km_pending_payment_id', json.paymentId);
+      setTimeout(()=>{ window.location.href=json.confirmation_url; },800);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Контент-Мастер · Вышла из системы</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +17,7 @@
   --font-display:'Spectral',Georgia,serif; --font-body:'Manrope',system-ui,sans-serif;
   --radius-sm:8px; --radius-md:12px; --sidebar-w:232px;
 }
-[data-theme="light"]{
+[data-theme="light"]{const returnUrl='https://yuliya-vyshla-iz-sistemy.github.io/kontent-master/app.html?payment_status=succeeded&product=km&tier='+tier;
   --bg:#F5EFE6; --bg2:#EDE6DA; --surface:#FFFFFF; --surface2:#F0E9DF;
   --border:rgba(58,42,77,0.12); --text-main:#2B2622; --text-muted:#6B5E56; --text-hint:#9E8A7E;
   --btn-primary-bg:#3A2A4D; --btn-primary-text:#F5EFE6; --btn-primary-hover:#4e3a66;
@@ -1566,10 +1569,11 @@ async function _kmHandlePaymentReturn(paymentId, tier){
     const resp=await fetch(KM_VERIFY,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
-      body:JSON.stringify({paymentId:paymentId,userEmail:_kmUser.email,tier})
+      body:JSON.stringify({paymentId:paymentId||localStorage.getItem('km_pending_payment_id'),userEmail:_kmUser.email,tier})
     });
     const json=await resp.json();
     history.replaceState(null,'',window.location.pathname);
+    localStorage.removeItem('km_pending_payment_id');
    if(json.success){
       _kmTier=tier; _kmPaid=true;
       _kmUpdateUI(); _kmShowDemoBanner();
