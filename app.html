@@ -1420,8 +1420,8 @@ function _kmGetMonth(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMon
   _kmShowDemoBanner();
   // Обработка возврата с ЮKassa
   const p = new URLSearchParams(window.location.search);
-  if(p.get('payment_id') && p.get('payment_status')==='succeeded' && p.get('product')==='km'){
-    _kmHandlePaymentReturn(p.get('payment_id'), p.get('tier'));
+  if(p.get('payment_status')==='succeeded' && p.get('product')==='km'){
+    _kmHandlePaymentReturn(localStorage.getItem('km_pending_payment_id'), p.get('tier'));
   }
 })();
 
