@@ -1523,7 +1523,7 @@ function openPaywall(soft){
 }
 function closePaywall(){
   document.getElementById('pw-modal').classList.remove('show');
-  document.getElementById('pw-payment-area').style.display='none';
+  const pwa=document.getElementById('pw-payment-area'); if(pwa) pwa.style.display='none';
 }
 
 // ── PAYMENT ───────────────────────────────────────────────────
