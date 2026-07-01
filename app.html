@@ -528,6 +528,15 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="setTpl('dialog',this)">💬 Диалог</button>
         <button class="tag" onclick="setTpl('provoke',this)">🔥 Провокация</button>
       </div></div>
+    <div class="form-group" id="postProdGroup">
+      <label class="form-label">Упомянуть продукт</label>
+      <select class="form-select" id="postProdSelect">
+        <option value="none">— Без продукта</option>
+        <option value="prod1" id="postProdOpt1">Продукт 1</option>
+        <option value="prod2" id="postProdOpt2" style="display:none">Продукт 2</option>
+        <option value="both" id="postProdOptBoth" style="display:none">Оба продукта</option>
+      </select>
+    </div>
     <button class="btn btn-primary" id="btnPost" onclick="genPost()"><span class="btn-text">✦ Сгенерировать</span><div class="spinner"></div></button>
   </div>
   <div class="card" id="postResult" style="display:none">
@@ -544,7 +553,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 </div>
 
 <!-- МОДАЛКА: ПОСТЕР К ПОСТУ -->
-<div id="posterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closePosterModal()">
+<div id="posterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closePosterModal()">
   <div style="background:var(--bg1);border-radius:16px;max-width:520px;margin:0 auto;padding:24px 20px;position:relative">
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:var(--eggplant);margin-bottom:18px">🎨 Постер к тексту</div>
 
@@ -688,7 +697,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 </div>
 
 <!-- МОДАЛКА: СТИЛЬ AI-ОБЛОЖКИ КАРУСЕЛИ -->
-<div id="coverStyleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeCoverStyleModal()">
+<div id="coverStyleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeCoverStyleModal()">
   <div style="background:var(--bg1);border-radius:16px;max-width:480px;margin:0 auto;padding:24px 20px">
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:var(--eggplant);margin-bottom:18px">🎨 Стиль AI-обложки</div>
 
@@ -1176,6 +1185,11 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <input class="form-input" id="imgApiKey" type="password" placeholder="Необязательно — только для AI-обложек" autocomplete="off">
       <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);" id="imgKeyHint">
         Как получить: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com/api-keys</a> — из РФ через GenAPI или VPN.</div></div>
+    <div class="form-group" id="kandinskySecretGroup" style="display:none">
+      <label class="form-label">Secret Key <span style="font-size:.75em;color:var(--text-muted)">(только для Kandinsky)</span></label>
+      <input class="form-input" id="imgSecretKey" type="password" placeholder="Secret Key от fusionbrain.ai" autocomplete="off">
+      <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);">Отдельно от API Key — оба нужны для Kandinsky. Найди в личном кабинете fusionbrain.ai → API.</div>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="saveImgKey()">💾 Сохранить Image-ключ</button>
       <button class="btn btn-secondary" onclick="testImgConn()">🧪 Проверить</button>
@@ -1722,9 +1736,9 @@ const IMGPROV={
 };
 
 function selProv(id,el){S.provider=id;setActive(el);document.getElementById('provLabel').textContent=PROV[id].name;document.getElementById('keyHint').innerHTML='Как получить: '+PROV[id].hint;document.getElementById('apiKey').value=localStorage.getItem('key_'+id)||'';}
-function selImgProv(id,el){S.imgProvider=id;setActive(el);document.getElementById('imgProvLabel').textContent=IMGPROV[id].name;document.getElementById('imgKeyHint').innerHTML='Как получить: '+IMGPROV[id].hint;document.getElementById('imgApiKey').value=localStorage.getItem('imgkey_'+id)||'';}
+function selImgProv(id,el){S.imgProvider=id;setActive(el);document.getElementById('imgProvLabel').textContent=IMGPROV[id].name;document.getElementById('imgKeyHint').innerHTML='Как получить: '+IMGPROV[id].hint;document.getElementById('imgApiKey').value=localStorage.getItem('imgkey_'+id)||'';const isKandinsky=id==='kandinsky';document.getElementById('kandinskySecretGroup').style.display=isKandinsky?'block':'none';if(isKandinsky)document.getElementById('imgSecretKey').value=localStorage.getItem('imgkey_kandinsky_secret')||'';}
 function saveKey(){const k=document.getElementById('apiKey').value.trim();if(!k){toast('Вставь API-ключ','err');return;}localStorage.setItem('key_'+S.provider,k);localStorage.setItem('activeProvider',S.provider);updateBadge();toast('Ключ сохранён ✓','ok');}
-function saveImgKey(){const k=document.getElementById('imgApiKey').value.trim();localStorage.setItem('imgkey_'+S.imgProvider,k);localStorage.setItem('activeImgProvider',S.imgProvider);toast('Image-ключ сохранён ✓','ok');}
+function saveImgKey(){const k=document.getElementById('imgApiKey').value.trim();localStorage.setItem('imgkey_'+S.imgProvider,k);localStorage.setItem('activeImgProvider',S.imgProvider);if(S.imgProvider==='kandinsky'){const sk=document.getElementById('imgSecretKey').value.trim();localStorage.setItem('imgkey_kandinsky_secret',sk);}toast('Image-ключ сохранён ✓','ok');}
 async function testImgConn(){
   const k=getImgKey();if(!k){toast('Сначала введи и сохрани Image-ключ','err');return;}
   const el=document.getElementById('testImgRes');
@@ -1739,7 +1753,7 @@ async function testImgConn(){
     let res;
     if(prov==='kandinsky'){
       // Kandinsky — проверяем через /key/api/v1/models
-      res=await fetch('https://api-key.fusionbrain.ai/key/api/v1/models',{headers:{'X-Key':'Key '+pk,'X-Secret':''}});
+      res=await fetch('https://api-key.fusionbrain.ai/key/api/v1/models',{headers:{'X-Key':'Key '+pk,'X-Secret':'Secret '+getImgSecret()}});
     } else if(prov==='openai_img'||prov==='genapi'){
       res=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+pk}});
     } else {
@@ -1759,6 +1773,7 @@ async function testImgConn(){
 }
 function getKey(){return localStorage.getItem('key_'+S.provider)||'';}
 function getImgKey(){const p=localStorage.getItem('activeImgProvider')||S.imgProvider;return localStorage.getItem('imgkey_'+p)||'';}
+function getImgSecret(){return localStorage.getItem('imgkey_kandinsky_secret')||'';}
 function getActiveImgProv(){return localStorage.getItem('activeImgProvider')||S.imgProvider;}
 function updateBadge(){const p=localStorage.getItem('activeProvider'),k=p?localStorage.getItem('key_'+p):null;document.getElementById('providerName').textContent=k?(PROV[p]?.name||p):'Не подключён';document.getElementById('statusDot').className='status-dot'+(k?'':' off');}
 
@@ -1834,7 +1849,7 @@ async function callImageAI(prompt){
   if(prov==='kandinsky'){
     // Шаг 1: запустить задачу
     const r1=await fetch('https://api.fusionbrain.ai/web/api/v1/text2image/run',{method:'POST',
-      headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+k},
+      headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+getImgSecret()},
       body:(()=>{const fd=new FormData();fd.append('prompt',prompt);fd.append('style','DEFAULT');fd.append('width','720');fd.append('height','1280');fd.append('num_images','1');return fd;})()});
     if(!r1.ok){const e=await r1.json().catch(()=>({}));throw new Error(e.message||'Kandinsky HTTP '+r1.status);}
     const j1=await r1.json();const uuid=j1.uuid;
@@ -1843,7 +1858,7 @@ async function callImageAI(prompt){
     for(let i=0;i<15;i++){
       await new Promise(res=>setTimeout(res,2000));
       const r2=await fetch('https://api.fusionbrain.ai/web/api/v1/text2image/status/'+uuid,{
-        headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+k}});
+        headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+getImgSecret()}});
       const j2=await r2.json();
       if(j2.status==='DONE'&&j2.images?.[0])return 'data:image/jpeg;base64,'+j2.images[0];
       if(j2.status==='FAIL')throw new Error('Kandinsky: генерация не удалась');
@@ -1871,10 +1886,12 @@ function buildSys(){
   if(p.audience)s+='Аудитория: '+p.audience+'\n';
   if(p.pains)s+='Боли аудитории: '+p.pains+'\n';
   // Продукты с названием, описанием и ссылкой
+  const prodSel=document.getElementById('postProdSelect')?.value||'prod1';
   const prods=[];
-  if(p.prod1name)prods.push(p.prod1name+(p.prod1desc?' — '+p.prod1desc:''));
-  if(p.prod2name)prods.push(p.prod2name+(p.prod2desc?' — '+p.prod2desc:''));
-  if(p.prod3name)prods.push(p.prod3name+(p.prod3desc?' — '+p.prod3desc:''));
+  if(prodSel==='prod1'||prodSel==='both'){if(p.prod1name)prods.push(p.prod1name+(p.prod1desc?' — '+p.prod1desc:''));}
+  if(prodSel==='prod2'||prodSel==='both'){if(p.prod2name)prods.push(p.prod2name+(p.prod2desc?' — '+p.prod2desc:''));}
+  if(prodSel==='none')prods.length=0;
+  if(!prods.length&&prodSel!=='none'){if(p.prod1name)prods.push(p.prod1name+(p.prod1desc?' — '+p.prod1desc:''));if(p.prod2name)prods.push(p.prod2name+(p.prod2desc?' — '+p.prod2desc:''));if(p.prod3name)prods.push(p.prod3name+(p.prod3desc?' — '+p.prod3desc:''));}
   if(prods.length&&p.productPlace!=='none'){
     s+='Продукты автора: '+prods.join('; ')+'\n';
     const pl={end:'В конце поста добавь призыв к действию (CTA) — без ссылки, ссылка будет добавлена отдельно',middle:'Упомяни продукт органично в середине текста, без ссылки',natural:'Упомяни продукт там где уместно, без ссылки'};
@@ -1882,11 +1899,12 @@ function buildSys(){
     s+='ВАЖНО: не пиши URL и не вставляй плейсхолдеры вида [ссылка] в текст — ссылка будет добавлена автоматически.\n';
   }
   if(p.cta)s+='Основной призыв: '+p.cta+'\n';
+  if(p.hashtags)s+='Хештеги (добавь в конец поста): '+p.hashtags+'\n';
   const cs={soft:'мягкий',medium:'убедительный',hard:'дерзкий с напором'};
   if(p.ctaStyle)s+='Стиль призыва: '+cs[p.ctaStyle]+'\n';
   if(p.context&&p.contextUse!=='none')s+='Контекст об авторе (используй в тексте): '+p.context+'\n';
   if(p.examples)s+='\nПримеры текстов автора (копируй стиль, длину фраз, структуру):\n'+p.examples+'\n';
-  s+='\nПравила: короткие абзацы, живой язык, конкретика, без канцелярита, цепляющее начало.';
+  s+='\nПравила: короткие абзацы, живой язык, конкретика, без канцелярита, цепляющее начало. НЕ используй markdown-разметку (никаких **, *, ##, — в начале строки и т.п.) — только чистый текст.';
   return s;
 }
 
@@ -2358,14 +2376,14 @@ async function callImageAIWithFormat(prompt, format) {
   if(prov==='kandinsky') {
     const sz = FORMAT_SIZES.kandinsky[format] || {w:720,h:1280};
     const r1 = await fetch('https://api.fusionbrain.ai/web/api/v1/text2image/run',{method:'POST',
-      headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+k},
+      headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+getImgSecret()},
       body:(()=>{const fd=new FormData();fd.append('prompt',prompt);fd.append('style','DEFAULT');fd.append('width',''+sz.w);fd.append('height',''+sz.h);fd.append('num_images','1');return fd;})()});
     if(!r1.ok){const e=await r1.json().catch(()=>({}));throw new Error(e.message||'Kandinsky HTTP '+r1.status);}
     const j1=await r1.json(); const uuid=j1.uuid;
     if(!uuid) throw new Error('Kandinsky не вернул uuid');
     for(let i=0;i<15;i++){
       await new Promise(res=>setTimeout(res,2000));
-      const r2=await fetch('https://api.fusionbrain.ai/web/api/v1/text2image/status/'+uuid,{headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+k}});
+      const r2=await fetch('https://api.fusionbrain.ai/web/api/v1/text2image/status/'+uuid,{headers:{'X-Key':'Key '+k,'X-Secret':'Secret '+getImgSecret()}});
       const j2=await r2.json();
       if(j2.status==='DONE'&&j2.images?.[0]) return 'data:image/jpeg;base64,'+j2.images[0];
       if(j2.status==='FAIL') throw new Error('Kandinsky: генерация не удалась');
@@ -2402,7 +2420,21 @@ async function genPost(adapt3){
   const prompt=adapt3
     ?'Напиши 3 варианта поста под одну тему.\nТема: '+topic+'. Структура: '+tn[S.template]+'.\nРаздели заголовками: === ВКонтакте ===, === Telegram ===, === Instagram ==='
     :'Напиши пост для '+pn[S.platform]+'. Тема: '+topic+'.\nСтруктура: '+tn[S.template]+'. Макс. '+ml[S.platform]+' символов.\nТолько готовый пост — никакого предисловия вроде "Вот пост:" или "Конечно!".';
-  try{const r=await callAI(prompt);document.getElementById('postText').textContent=r;document.getElementById('postResult').style.display='block';addHist('post',topic,r);toast('Готово ✓','ok');}
+  try{
+    const r=await callAI(prompt);
+    const p=getProfile();
+    const prodSel=document.getElementById('postProdSelect')?.value||'prod1';
+    const links=[];
+    if((prodSel==='prod1'||prodSel==='both')&&p.prod1link&&p.prod1link.trim().length>3)
+      links.push((p.prod1name?p.prod1name+': ':'')+p.prod1link.trim());
+    if((prodSel==='prod2'||prodSel==='both')&&p.prod2link&&p.prod2link.trim().length>3)
+      links.push((p.prod2name?p.prod2name+': ':'')+p.prod2link.trim());
+    const finalText=links.length?r.trim()+'\n\n'+links.join('\n'):r;
+    document.getElementById('postText').textContent=finalText;
+    document.getElementById('postResult').style.display='block';
+    addHist('post',topic,finalText);
+    toast('Готово ✓','ok');
+  }
   catch(e){toast('Ошибка: '+e.message,'err');}
   finally{load(btn,false);}
 }
@@ -2455,8 +2487,9 @@ async function genSlides(){
     :(()=>{
       const p=getProfile();
       const hasProd=p.prod1name&&p.prod1name.trim();
+      const prodList=[p.prod1name,p.prod2name].filter(Boolean).join(' и ');
       const lastSlide=hasProd
-        ?'Последний слайд — призыв к действию с упоминанием продукта «'+p.prod1name+'». НЕ пиши URL, не пиши фразы вроде «ссылка в профиле» или «ссылка ниже» — просто заверши мотивирующим призывом, ссылка будет добавлена автоматически.'
+        ?'Последний слайд — призыв к действию с упоминанием продукта(ов) «'+prodList+'». НЕ пиши URL, не пиши фразы вроде «ссылка в профиле» или «ссылка ниже» — просто заверши мотивирующим призывом, ссылка будет добавлена автоматически.'
         :'Последний слайд — мотивирующий призыв к действию. НЕ упоминай никакой продукт, не используй заглушки в скобках типа [название]. Просто заверши карусель сильным призывом по теме.';
       return 'Напиши тексты для карусели из '+n+' слайдов. Тема: "'+topic+'". Хук обложки: "'+(S.selHook||topic)+'".\nФормат строго:\nСЛАЙД 1\n[заголовок обложки]\n[подзаголовок 1-2 строки]\n---\nСЛАЙД 2\n[заголовок слайда]\n[текст тела 2-3 строки]\n---\n'+lastSlide+factsLine+'\nТолько слайды, без вводных фраз и пояснений AI.';
     })();
@@ -3009,7 +3042,13 @@ function loadProfile(){
   // Синхронизируем HEX поля
   ['Eggplant','Cream','Terra','Amber','Graphite','Greige'].forEach(n=>{const c=document.getElementById('color'+n);const hx=document.getElementById('hex'+n);if(c&&hx)hx.value=c.value.toUpperCase();});
   s('pExamples',p.examples);
-  // Восстанавливаем ползунок фото
+  // Обновляем селектор продуктов в посте
+  const opt1=document.getElementById('postProdOpt1');
+  const opt2=document.getElementById('postProdOpt2');
+  const optBoth=document.getElementById('postProdOptBoth');
+  if(opt1){opt1.textContent=p.prod1name||'Продукт 1';opt1.style.display=p.prod1name?'':'none';}
+  if(opt2){opt2.textContent=p.prod2name||'Продукт 2';opt2.style.display=p.prod2name?'':'none';}
+  if(optBoth){optBoth.style.display=(p.prod1name&&p.prod2name)?'':'none';}
   const slider=document.getElementById('photoOffsetSlider');
   if(slider&&p.photoOffset){slider.value=p.photoOffset;S.photoOffset=parseInt(p.photoOffset);document.getElementById('photoOffsetVal').textContent=p.photoOffset;}
   setTimeout(()=>updatePhotoPreview(S.photoOffset||38),100);
