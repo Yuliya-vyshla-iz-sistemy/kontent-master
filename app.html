@@ -1178,8 +1178,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       </div>
       <div class="pcard" onclick="selImgProv('gemini_img',this)">
         <div class="pcard-badge warn">VPN/агр.</div>
-        <div class="pcard-name">Google Imagen</div>
-        <div class="pcard-models">Imagen 3 · Высокое качество</div>
+        <div class="pcard-name">Gemini Flash Image</div>
+        <div class="pcard-models">Gemini 2.5 Flash Image · Бесплатный лимит</div>
       </div>
       <div class="pcard" onclick="selImgProv('genapi_img',this)">
         <div class="pcard-badge">Россия ✓</div>
@@ -1265,7 +1265,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <table class="key-table">
         <tr><th>Провайдер</th><th>Где взять ключ</th><th>Россия</th><th>Особенности</th></tr>
         <tr><td><strong>OpenAI Images</strong></td><td><a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a></td><td>⚠️ VPN/GenAPI</td><td>Лучший русский текст на картинках</td></tr>
-        <tr><td><strong>Google Imagen</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Высокое качество, реализм</td></tr>
+        <tr><td><strong>Gemini Flash Image</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Бесплатный лимит · Картинки + текст на изображении</td></tr>
         <tr><td><strong>GenAPI.ru</strong></td><td><a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a></td><td>✅ Рубли</td><td>Midjourney, DALL·E, Flux — всё в одном</td></tr>
         <tr><td><strong>Kandinsky</strong></td><td><a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a></td><td>✅ Рубли</td><td>Бесплатный лимит ~100 запросов/день</td></tr>
       </table>
@@ -1741,7 +1741,7 @@ const PROV={
 // IMAGE ПРОВАЙДЕРЫ — 4 штуки
 const IMGPROV={
   openai_img:{name:'OpenAI Images',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini_img:{name:'Google Imagen',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN'},
+  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — бесплатный лимит, из РФ через VPN'},
   genapi_img:{name:'GenAPI.ru',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели картинок, рубли, из РФ'},
   kandinsky:{name:'Kandinsky (Сбер)',hint:'Ключ: <a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a> → GigaChat API → Kandinsky'}
 };
@@ -1830,16 +1830,17 @@ async function callImageAI(prompt){
     const d=await r.json();return d.data[0].url;
   }
 
-  // Google Imagen 3
+  // Gemini 2.5 Flash Image (бесплатный лимит)
   if(prov==='gemini_img'){
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key='+k,{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({instances:[{prompt}],parameters:{sampleCount:1,aspectRatio:'9:16'}})});
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT'],responseMimeType:'image/png'}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d=await r.json();
-    const b64=d.predictions?.[0]?.bytesBase64Encoded;
-    if(!b64)throw new Error('Imagen не вернул картинку');
-    return 'data:image/png;base64,'+b64;
+    const parts=d.candidates?.[0]?.content?.parts||[];
+    const imgPart=parts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+    if(!imgPart)throw new Error('Gemini не вернул картинку');
+    return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
   }
 
   // GenAPI.ru — через OpenAI-совместимый endpoint с моделью Flux
@@ -2358,15 +2359,15 @@ async function callImageAIWithFormat(prompt, format) {
   }
 
   if(prov==='gemini_img') {
-    const ratio = FORMAT_SIZES.gemini_img[format] || '9:16';
-    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key='+k,{
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({instances:[{prompt}],parameters:{sampleCount:1,aspectRatio:ratio}})});
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT'],responseMimeType:'image/png'}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d = await r.json();
-    const b64 = d.predictions?.[0]?.bytesBase64Encoded;
-    if(!b64) throw new Error('Imagen не вернул картинку');
-    return 'data:image/png;base64,'+b64;
+    const parts=d.candidates?.[0]?.content?.parts||[];
+    const imgPart=parts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+    if(!imgPart) throw new Error('Gemini не вернул картинку');
+    return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
   }
 
   if(prov==='genapi_img') {
@@ -2670,7 +2671,6 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
     }
   }
 
-  // Ссылка — берём из профиля с учётом выбора продукта
   const carSel2=document.getElementById('carProdSelect')?.value||'auto';
   const carLinks=[];
   if(carSel2!=='none'){
