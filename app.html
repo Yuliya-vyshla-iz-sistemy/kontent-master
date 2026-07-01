@@ -528,7 +528,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="setTpl('dialog',this)">💬 Диалог</button>
         <button class="tag" onclick="setTpl('provoke',this)">🔥 Провокация</button>
       </div></div>
-    <div class="form-group" id="postProdGroup">
+    <div class="form-group">
       <label class="form-label">Упомянуть продукт</label>
       <select class="form-select" id="postProdSelect">
         <option value="auto">— Как в профиле</option>
@@ -554,9 +554,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 </div>
 
 <!-- МОДАЛКА: ПОСТЕР К ПОСТУ -->
-<div id="posterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closePosterModal()">
-  <div style="background:var(--bg1);border-radius:16px;max-width:520px;margin:0 auto;padding:24px 20px;position:relative">
-    <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:var(--eggplant);margin-bottom:18px">🎨 Постер к тексту</div>
+<div id="posterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closePosterModal()">
+  <div style="background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:24px 20px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+    <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:18px">🎨 Постер к тексту</div>
 
     <div class="form-group">
       <label class="form-label">Визуальный стиль</label>
@@ -671,7 +671,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   <div class="card" id="carHooks" style="display:none">
     <div class="card-title">Выбери хук — и получи слайды</div>
     <div id="carHooksList"></div>
-    <div class="form-group" id="carProdGroup">
+    <div class="form-group">
       <label class="form-label">Упомянуть продукт на последнем слайде</label>
       <select class="form-select" id="carProdSelect">
         <option value="auto">— Как в профиле</option>
@@ -708,9 +708,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 </div>
 
 <!-- МОДАЛКА: СТИЛЬ AI-ОБЛОЖКИ КАРУСЕЛИ -->
-<div id="coverStyleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeCoverStyleModal()">
-  <div style="background:var(--bg1);border-radius:16px;max-width:480px;margin:0 auto;padding:24px 20px">
-    <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:var(--eggplant);margin-bottom:18px">🎨 Стиль AI-обложки</div>
+<div id="coverStyleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeCoverStyleModal()">
+  <div style="background:#1e1a17;border-radius:16px;max-width:480px;margin:0 auto;padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+    <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:18px">🎨 Стиль AI-обложки</div>
 
     <div class="form-group">
       <label class="form-label">Визуальный стиль</label>
@@ -2671,13 +2671,11 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   }
 
   // Ссылка — берём из профиля с учётом выбора продукта
-  const carSel=document.getElementById('carProdSelect')?.value||'auto';
+  const carSel2=document.getElementById('carProdSelect')?.value||'auto';
   const carLinks=[];
-  if(carSel!=='none'){
-    if((carSel==='prod1'||carSel==='both'||carSel==='auto')&&p.prod1link&&p.prod1link.trim().length>3)
-      carLinks.push(p.prod1link.trim());
-    if((carSel==='prod2'||carSel==='both')&&p.prod2link&&p.prod2link.trim().length>3)
-      carLinks.push(p.prod2link.trim());
+  if(carSel2!=='none'){
+    if((carSel2==='prod1'||carSel2==='both'||carSel2==='auto')&&p.prod1link&&p.prod1link.trim().length>3)carLinks.push(p.prod1link.trim());
+    if((carSel2==='prod2'||carSel2==='both')&&p.prod2link&&p.prod2link.trim().length>3)carLinks.push(p.prod2link.trim());
   }
   const prod1link=carLinks[0]||'';
   const prod2link=carLinks[1]||'';
@@ -2701,27 +2699,30 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   // Показываем на последнем слайде если ссылка задана
   const showLink=prod1link&&prod1link.length>3&&idx===total-1;
   if(showLink){
+    // Сдвигаем блок ссылки выше, если на этом слайде есть доп.ники под ним
     const linkShift = nicksZoneH;
     const linkLabelY=H-218-linkShift;
-    const linkY=H-190-linkShift;
-    const link2Y=H-162-linkShift;
+    const linkY=H-190-linkShift; // фиксированная позиция — выше ника
+    const fullLink=prod1link; // полная ссылка с https://
 
+    // Подпись "Ссылка ↓" над самим URL
     ctx.fillStyle=dark?'rgba(224,163,62,0.85)':'rgba(194,90,62,0.85)';
     ctx.font='600 20px Manrope,sans-serif';
     ctx.fillText('🔗 Ссылка ↓',60,linkLabelY);
 
+    // Сама ссылка — подбираем размер шрифта чтобы влезла
     ctx.fillStyle=dark?c.amber:c.terra;
     let fontSize=22;
     ctx.font='600 '+fontSize+'px Manrope,sans-serif';
-    while(ctx.measureText(prod1link).width>W-120&&fontSize>13){fontSize-=1;ctx.font='600 '+fontSize+'px Manrope,sans-serif';}
-    ctx.fillText(prod1link,60,linkY);
-
-    // Вторая ссылка если есть
+    while(ctx.measureText(fullLink).width>W-120&&fontSize>13){
+      fontSize-=1;
+      ctx.font='600 '+fontSize+'px Manrope,sans-serif';
+    }
+    ctx.fillText(fullLink,60,linkY);
     if(prod2link&&prod2link.length>3){
-      let fontSize2=20;
-      ctx.font='600 '+fontSize2+'px Manrope,sans-serif';
-      while(ctx.measureText(prod2link).width>W-120&&fontSize2>12){fontSize2-=1;ctx.font='600 '+fontSize2+'px Manrope,sans-serif';}
-      ctx.fillText(prod2link,60,link2Y);
+      let fs2=20;ctx.font='600 '+fs2+'px Manrope,sans-serif';
+      while(ctx.measureText(prod2link).width>W-120&&fs2>12){fs2--;ctx.font='600 '+fs2+'px Manrope,sans-serif';}
+      ctx.fillText(prod2link,60,linkY+28);
     }
   }
 
@@ -3070,14 +3071,13 @@ function loadProfile(){
   // Синхронизируем HEX поля
   ['Eggplant','Cream','Terra','Amber','Graphite','Greige'].forEach(n=>{const c=document.getElementById('color'+n);const hx=document.getElementById('hex'+n);if(c&&hx)hx.value=c.value.toUpperCase();});
   s('pExamples',p.examples);
-  // Обновляем селекторы продуктов в посте и карусели
   ['post','car'].forEach(prefix=>{
-    const opt1=document.getElementById(prefix+'ProdOpt1');
-    const opt2=document.getElementById(prefix+'ProdOpt2');
-    const optBoth=document.getElementById(prefix+'ProdOptBoth');
-    if(opt1){opt1.textContent=p.prod1name||'Продукт 1';opt1.style.display=p.prod1name?'':'none';}
-    if(opt2){opt2.textContent=p.prod2name||'Продукт 2';opt2.style.display=p.prod2name?'':'none';}
-    if(optBoth){optBoth.style.display=(p.prod1name&&p.prod2name)?'':'none';}
+    const o1=document.getElementById(prefix+'ProdOpt1');
+    const o2=document.getElementById(prefix+'ProdOpt2');
+    const ob=document.getElementById(prefix+'ProdOptBoth');
+    if(o1){o1.textContent=p.prod1name||'Продукт 1';o1.style.display=p.prod1name?'':'none';}
+    if(o2){o2.textContent=p.prod2name||'Продукт 2';o2.style.display=p.prod2name?'':'none';}
+    if(ob)ob.style.display=(p.prod1name&&p.prod2name)?'':'none';
   });
   // Восстанавливаем ползунок фото
   const slider=document.getElementById('photoOffsetSlider');
