@@ -1179,7 +1179,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="pcard" onclick="selImgProv('gemini_img',this)">
         <div class="pcard-badge warn">VPN/агр.</div>
         <div class="pcard-name">Gemini Flash Image</div>
-        <div class="pcard-models">Gemini 2.5 Flash Image · платно ~$0.04/фото</div>
+        <div class="pcard-models">Gemini 2.5 Flash Image · ~$0.04/фото</div>
       </div>
       <div class="pcard" onclick="selImgProv('genapi_img',this)">
         <div class="pcard-badge">Россия ✓</div>
@@ -1265,7 +1265,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <table class="key-table">
         <tr><th>Провайдер</th><th>Где взять ключ</th><th>Россия</th><th>Особенности</th></tr>
         <tr><td><strong>OpenAI Images</strong></td><td><a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a></td><td>⚠️ VPN/GenAPI</td><td>Лучший русский текст на картинках</td></tr>
-        <tr><td><strong>Gemini Flash Image</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Платно ~$0.04/фото · бесплатного API-лимита нет</td></tr>
+        <tr><td><strong>Google Imagen</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Высокое качество, реализм</td></tr>
         <tr><td><strong>GenAPI.ru</strong></td><td><a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a></td><td>✅ Рубли</td><td>Midjourney, DALL·E, Flux — всё в одном</td></tr>
         <tr><td><strong>Kandinsky</strong></td><td><a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a></td><td>✅ Рубли</td><td>Бесплатный лимит ~100 запросов/день</td></tr>
       </table>
@@ -1741,7 +1741,7 @@ const PROV={
 // IMAGE ПРОВАЙДЕРЫ — 4 штуки
 const IMGPROV={
   openai_img:{name:'OpenAI Images',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN. Платно ~$0.04/фото, бесплатного API-лимита нет.'},
+  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN. Платно ~$0.04/фото.'},
   genapi_img:{name:'GenAPI.ru',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели картинок, рубли, из РФ'},
   kandinsky:{name:'Kandinsky (Сбер)',hint:'Ключ: <a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a> → GigaChat API → Kandinsky'}
 };
@@ -2905,7 +2905,9 @@ async function genAiCover(){
     const act=document.createElement('div');act.className='slide-canvas-actions';
     const btn2=document.createElement('button');btn2.className='mini-btn';btn2.textContent='⬇ Скачать обложку';
     btn2.onclick=()=>{const a=document.createElement('a');a.href=imgUrl;a.download='ai-cover.png';a.click();};
-    act.appendChild(btn2);card.appendChild(img);card.appendChild(act);wrap.appendChild(card);
+    const btn3=document.createElement('button');btn3.className='mini-btn';btn3.textContent='🔄 Перегенерировать';
+    btn3.onclick=()=>openCoverStyleModal();
+    act.appendChild(btn2);act.appendChild(btn3);card.appendChild(img);card.appendChild(act);wrap.appendChild(card);
     toast('AI-обложка готова ✓','ok');
   }catch(e){
     wrap.innerHTML='<div class="locked-overlay">❌ Ошибка: '+e.message+'<br><br>Попробуй <strong>Типографскую обложку</strong> — она работает всегда.</div>';
