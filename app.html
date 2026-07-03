@@ -1179,7 +1179,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="pcard" onclick="selImgProv('gemini_img',this)">
         <div class="pcard-badge warn">VPN/агр.</div>
         <div class="pcard-name">Gemini Flash Image</div>
-        <div class="pcard-models">Gemini 2.5 Flash Image · Бесплатный лимит</div>
+        <div class="pcard-models">Gemini 2.5 Flash Image · платно ~$0.04/фото</div>
       </div>
       <div class="pcard" onclick="selImgProv('genapi_img',this)">
         <div class="pcard-badge">Россия ✓</div>
@@ -1265,7 +1265,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <table class="key-table">
         <tr><th>Провайдер</th><th>Где взять ключ</th><th>Россия</th><th>Особенности</th></tr>
         <tr><td><strong>OpenAI Images</strong></td><td><a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a></td><td>⚠️ VPN/GenAPI</td><td>Лучший русский текст на картинках</td></tr>
-        <tr><td><strong>Gemini Flash Image</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Бесплатный лимит · Картинки + текст на изображении</td></tr>
+        <tr><td><strong>Gemini Flash Image</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Платно ~$0.04/фото · бесплатного API-лимита нет</td></tr>
         <tr><td><strong>GenAPI.ru</strong></td><td><a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a></td><td>✅ Рубли</td><td>Midjourney, DALL·E, Flux — всё в одном</td></tr>
         <tr><td><strong>Kandinsky</strong></td><td><a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a></td><td>✅ Рубли</td><td>Бесплатный лимит ~100 запросов/день</td></tr>
       </table>
@@ -1741,7 +1741,7 @@ const PROV={
 // IMAGE ПРОВАЙДЕРЫ — 4 штуки
 const IMGPROV={
   openai_img:{name:'OpenAI Images',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — бесплатный лимит, из РФ через VPN'},
+  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN. Платно ~$0.04/фото, бесплатного API-лимита нет.'},
   genapi_img:{name:'GenAPI.ru',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели картинок, рубли, из РФ'},
   kandinsky:{name:'Kandinsky (Сбер)',hint:'Ключ: <a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a> → GigaChat API → Kandinsky'}
 };
@@ -1830,11 +1830,11 @@ async function callImageAI(prompt){
     const d=await r.json();return d.data[0].url;
   }
 
-  // Gemini 2.5 Flash Image (бесплатный лимит)
+  // Gemini 2.5 Flash Image
   if(prov==='gemini_img'){
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key='+k,{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT'],responseMimeType:'image/png'}})});
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d=await r.json();
     const parts=d.candidates?.[0]?.content?.parts||[];
@@ -2359,9 +2359,9 @@ async function callImageAIWithFormat(prompt, format) {
   }
 
   if(prov==='gemini_img') {
-    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key='+k,{
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT'],responseMimeType:'image/png'}})});
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d = await r.json();
     const parts=d.candidates?.[0]?.content?.parts||[];
