@@ -622,7 +622,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="accent-line"></div>
     <div class="card-title">Создать карусель</div>
     <div class="form-group"><label class="form-label">Тип</label>
-      <div class="tag-group">
+      <div class="tag-group" id="carType">
         <button class="tag active" onclick="setCt('viral',this)">🔥 Вирусная</button>
         <button class="tag" onclick="setCt('warmup',this)">📸 Прогрев из фото</button>
         <button class="tag" onclick="setCt('script',this)">📋 По сценарию</button>
@@ -740,6 +740,56 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div style="display:flex;gap:10px;margin-top:18px">
       <button class="btn btn-secondary" style="flex:1" onclick="closeCoverStyleModal()">Отмена</button>
       <button class="btn btn-primary" style="flex:2" id="btnGenCover" onclick="genAiCoverStyled()"><span class="btn-text">✦ Создать обложку</span><div class="spinner"></div></button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: ПРОГРЕВ ИЗ ФОТО -->
+<div id="warmupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeWarmupModal()">
+  <div style="background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:28px 24px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+    <button onclick="closeWarmupModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1">×</button>
+    <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:6px">📸 Прогрев из фото</div>
+    <div style="font-size:.82em;color:var(--text-muted);margin-bottom:20px">Загрузи фото из жизни → AI придумает прогрев → карусель + пост</div>
+
+    <!-- Шаг 1: загрузка фото -->
+    <div id="warmupStep1">
+      <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">📷 Загрузи фото (до 5 штук)</div>
+      <div id="warmupDropzone" onclick="document.getElementById('warmupFileInput').click()" ondragover="event.preventDefault()" ondrop="warmupDrop(event)"
+        style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:12px"
+        onmouseover="this.style.borderColor='var(--terra)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:2rem;margin-bottom:8px">📸</div>
+        <div style="font-size:.85em;color:var(--text-muted)">Нажми или перетащи фото сюда<br><span style="font-size:.8em;opacity:.7">JPG, PNG — до 5 файлов</span></div>
+      </div>
+      <input type="file" id="warmupFileInput" accept="image/*" multiple style="display:none" onchange="warmupFilesChosen(this.files)">
+      <div id="warmupPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
+
+      <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">✏️ Где ты и что делаешь на фото?</div>
+      <textarea id="warmupContext" class="form-input" rows="3" placeholder="Например: на конференции, выступаю с докладом. Вечером гуляю по городу. На кофе-брейке с коллегами." style="resize:vertical;width:100%;margin-bottom:6px"></textarea>
+      <div style="font-size:.75em;color:var(--text-hint);margin-bottom:16px">Чем подробнее — тем лучше AI привяжет к твоей нише</div>
+
+      <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📱 Платформа</div>
+      <select id="warmupPlatform" class="form-select" style="margin-bottom:20px">
+        <option value="vk">ВКонтакте</option>
+        <option value="tg">Telegram</option>
+        <option value="max">Макс</option>
+      </select>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeWarmupModal()">Отмена</button>
+        <button class="btn btn-primary" style="flex:2" id="btnWarmupConcept" onclick="genWarmupConcept()">
+          <span class="btn-text">🧠 Придумать концепцию →</span><div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Шаг 2: результат концепции -->
+    <div id="warmupStep2" style="display:none">
+      <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">💡 Концепция прогрева</div>
+      <div id="warmupConceptResult" style="background:rgba(255,255,255,0.05);border-radius:10px;padding:16px;font-size:.88em;color:var(--text-main);line-height:1.7;margin-bottom:16px;white-space:pre-wrap"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" style="flex:1" onclick="warmupBack()">← Назад</button>
+        <button class="btn btn-primary" style="flex:2" onclick="applyWarmupConcept()">✦ Создать карусель и пост</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1712,7 +1762,139 @@ function navEl(id){return document.querySelector('.nav-item[onclick*="\''+id+'\'
 function setActive(el){const p=el.closest('.tag-group,.platform-row,.provider-grid');p&&p.querySelectorAll('.tag,.ptab,.pcard').forEach(e=>e.classList.remove('active'));el.classList.add('active');}
 function setPt(p,el){S.platform=p;setActive(el);}
 function setTpl(t,el){S.template=t;setActive(el);}
-function setCt(t,el){S.carType=t;setActive(el);document.getElementById('scriptInputBlock').style.display=t==='script'?'block':'none';}
+function setCt(t,el){
+  S.carType=t;
+  setActive(el);
+  document.getElementById('scriptInputBlock').style.display=t==='script'?'block':'none';
+  if(t==='warmup') openWarmupModal();
+}
+
+// ── ПРОГРЕВ ИЗ ФОТО ──
+let warmupPhotos=[]; // массив {name, b64, mime}
+
+function openWarmupModal(){
+  warmupPhotos=[];
+  document.getElementById('warmupPreview').innerHTML='';
+  document.getElementById('warmupContext').value='';
+  document.getElementById('warmupStep1').style.display='block';
+  document.getElementById('warmupStep2').style.display='none';
+  document.getElementById('warmupModal').style.display='block';
+}
+function closeWarmupModal(){
+  document.getElementById('warmupModal').style.display='none';
+  // Сброс типа карусели обратно на вирусную
+  const firstTag=document.querySelector('#carType .tag');
+  if(firstTag){setCt('viral',firstTag);}
+}
+function warmupBack(){
+  document.getElementById('warmupStep1').style.display='block';
+  document.getElementById('warmupStep2').style.display='none';
+}
+
+function warmupDrop(e){
+  e.preventDefault();
+  warmupFilesChosen(e.dataTransfer.files);
+}
+
+function warmupFilesChosen(files){
+  const arr=Array.from(files).slice(0,5-warmupPhotos.length);
+  arr.forEach(file=>{
+    if(!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const b64=ev.target.result.split(',')[1];
+      warmupPhotos.push({name:file.name,b64,mime:file.type});
+      renderWarmupPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderWarmupPreview(){
+  const wrap=document.getElementById('warmupPreview');
+  wrap.innerHTML=warmupPhotos.map((p,i)=>`
+    <div style="position:relative;display:inline-block">
+      <img src="data:${p.mime};base64,${p.b64}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">
+      <button onclick="warmupRemovePhoto(${i})" style="position:absolute;top:-6px;right:-6px;background:var(--terra);color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:.65rem;cursor:pointer;line-height:1">×</button>
+    </div>`).join('');
+}
+function warmupRemovePhoto(i){
+  warmupPhotos.splice(i,1);
+  renderWarmupPreview();
+}
+
+async function genWarmupConcept(){
+  if(!warmupPhotos.length){toast('Загрузи хотя бы одно фото','err');return;}
+  const context=document.getElementById('warmupContext').value.trim();
+  const platform=document.getElementById('warmupPlatform').value;
+  const p=getProfile();
+  const btn=document.getElementById('btnWarmupConcept');
+  load(btn,true);
+
+  const platformName={vk:'ВКонтакте',tg:'Telegram',max:'Макс'}[platform]||'соцсети';
+  const niche=p.niche||'эксперт';
+  const tone=p.tone||'дружелюбный, живой';
+
+  // Собираем контент для Gemini Vision
+  const parts=[
+    {text:`Ты — эксперт по контент-маркетингу. Тебе прислали ${warmupPhotos.length} фото из жизни автора.
+Ниша автора: ${niche}. Голос бренда: ${tone}.
+Контекст фото: ${context||'обычный день автора'}.
+Платформа: ${platformName}.
+
+Придумай концепцию прогрева-карусели на основе этих фото:
+1. ТЕМА КАРУСЕЛИ (1 строка — цепляющая)
+2. ХУК ОБЛОЖКИ (до 8 слов)
+3. ПЛАН СЛАЙДОВ (5-7 слайдов, заголовок каждого)
+4. ПОСТ К КАРУСЕЛИ (короткий, 3-4 абзаца, живым языком, без markdown)
+
+Пиши конкретно, под нишу автора. Не используй слова "эксперт", "специалист". НЕ используй markdown-разметку.`}
+  ];
+
+  // Добавляем фото
+  warmupPhotos.forEach(ph=>{
+    parts.push({inlineData:{mimeType:ph.mime,data:ph.b64}});
+  });
+
+  // Используем Gemini (он умеет анализировать изображения)
+  const k=localStorage.getItem('imgkey_gemini_img')||localStorage.getItem('apikey_gemini')||'';
+  if(!k){toast('Для этой функции нужен ключ Gemini в Настройках AI → Image AI','err');load(btn,false);return;}
+
+  try{
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+k,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.9,maxOutputTokens:1500}})
+    });
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+    const d=await r.json();
+    const text=d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
+    if(!text)throw new Error('Gemini не вернул ответ');
+    document.getElementById('warmupConceptResult').textContent=text;
+    document.getElementById('warmupStep1').style.display='none';
+    document.getElementById('warmupStep2').style.display='block';
+    S.warmupConcept=text;
+    toast('Концепция готова ✓','ok');
+  }catch(e){
+    toast('Ошибка: '+e.message,'err');
+  }finally{load(btn,false);}
+}
+
+function applyWarmupConcept(){
+  const concept=S.warmupConcept||'';
+  // Извлекаем тему карусели из концепции
+  const lines=concept.split('\n').filter(l=>l.trim());
+  const topicLine=lines.find(l=>/ТЕМА|тема/i.test(l));
+  const topic=topicLine?topicLine.replace(/.*[:：]/,'').trim():lines[0]||'Прогрев из жизни';
+  // Вставляем тему в поле и закрываем модалку
+  document.getElementById('carTopic').value=topic;
+  // Вставляем концепцию в поле фактов чтобы AI использовал её
+  const factsEl=document.getElementById('carFacts');
+  if(factsEl)factsEl.value='Используй эту концепцию прогрева:\n'+concept;
+  closeWarmupModal();
+  // Автоматически запускаем генерацию слайдов
+  genSlides();
+}
 function setFn(f,el){S.funnel=f;setActive(el);}
 function setRm(m,el){S.rwMode=m;setActive(el);}
 function setHt(t,el){S.hookTone=t;setActive(el);}
