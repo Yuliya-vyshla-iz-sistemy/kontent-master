@@ -764,7 +764,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div id="warmupPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
 
       <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">✏️ Где ты и что делаешь на фото?</div>
-      <textarea id="warmupContext" class="form-input" rows="3" placeholder="Например: на конференции, выступаю с докладом. Вечером гуляю по городу. На кофе-брейке с коллегами." style="resize:vertical;width:100%;margin-bottom:6px"></textarea>
+      <textarea id="warmupContext" class="form-input" rows="3" placeholder="Например: утро дома за ноутбуком. Прогулка в парке. Рабочий стол, планирую день." style="resize:vertical;width:100%;margin-bottom:6px"></textarea>
       <div style="font-size:.75em;color:var(--text-hint);margin-bottom:16px">Чем подробнее — тем лучше AI привяжет к твоей нише</div>
 
       <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">📱 Платформа</div>
@@ -785,11 +785,16 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <!-- Шаг 2: результат концепции -->
     <div id="warmupStep2" style="display:none">
       <div style="font-size:.78em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">💡 Концепция прогрева</div>
-      <div id="warmupConceptResult" style="background:rgba(255,255,255,0.05);border-radius:10px;padding:16px;font-size:.88em;color:var(--text-main);line-height:1.7;margin-bottom:16px;white-space:pre-wrap"></div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-secondary" style="flex:1" onclick="warmupBack()">← Назад</button>
-        <button class="btn btn-primary" style="flex:2" onclick="applyWarmupConcept()">✦ Создать карусель и пост</button>
+      <div id="warmupConceptResult" style="background:rgba(255,255,255,0.05);border-radius:10px;padding:16px;font-size:.88em;color:#F5EFE6;line-height:1.7;margin-bottom:16px;white-space:pre-wrap"></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-secondary" style="flex:1;font-size:.82em" onclick="warmupBack()">← Назад</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.82em" onclick="regenWarmupConcept()">🔄 Перегенерировать</button>
       </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:.75em;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:6px">✏️ Редактировать концепцию</label>
+        <textarea id="warmupConceptEdit" rows="6" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;font-size:.85em;color:#F5EFE6;line-height:1.6;resize:vertical"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="applyWarmupConcept()">✦ Создать карусель и пост</button>
     </div>
   </div>
 </div>
@@ -1780,11 +1785,18 @@ function openWarmupModal(){
   document.getElementById('warmupStep2').style.display='none';
   document.getElementById('warmupModal').style.display='block';
 }
-function closeWarmupModal(){
+function closeWarmupModal(resetType=true){
   document.getElementById('warmupModal').style.display='none';
-  // Сброс типа карусели обратно на вирусную
-  const firstTag=document.querySelector('#carType .tag');
-  if(firstTag){setCt('viral',firstTag);}
+  if(resetType){
+    const firstTag=document.querySelector('#carType .tag');
+    if(firstTag){setCt('viral',firstTag);}
+  }
+}
+function regenWarmupConcept(){
+  document.getElementById('warmupStep2').style.display='none';
+  document.getElementById('warmupStep1').style.display='block';
+  // Запускаем генерацию снова
+  genWarmupConcept();
 }
 function warmupBack(){
   document.getElementById('warmupStep1').style.display='block';
@@ -1856,21 +1868,49 @@ async function genWarmupConcept(){
     parts.push({inlineData:{mimeType:ph.mime,data:ph.b64}});
   });
 
-  // Используем Gemini (он умеет анализировать изображения)
-  const k=localStorage.getItem('imgkey_gemini_img')||localStorage.getItem('apikey_gemini')||'';
-  if(!k){toast('Для этой функции нужен ключ Gemini в Настройках AI → Image AI','err');load(btn,false);return;}
+  // Определяем провайдер с поддержкой vision
+  const visionProviders=['openai','openai_compat','gemini','anthropic','gemini_img'];
+  const currentProv=S.provider||'deepseek';
+  if(!visionProviders.includes(currentProv)){
+    toast('Прогрев из фото требует GPT, Gemini или Claude — выбери в Настройках AI','err');
+    load(btn,false);return;
+  }
+  const k=localStorage.getItem('apikey_'+currentProv)||getImgKey()||'';
+  if(!k){toast('Нет ключа для выбранного AI — добавь его в Настройках AI','err');load(btn,false);return;}
 
   try{
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+k,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.9,maxOutputTokens:1500}})
-    });
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
-    const d=await r.json();
-    const text=d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
-    if(!text)throw new Error('Gemini не вернул ответ');
+    let text='';
+    if(currentProv==='gemini'||currentProv==='gemini_img'){
+      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+k,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.9,maxOutputTokens:1500}})});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+      const d=await r.json();
+      text=d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
+    } else if(currentProv==='openai'||currentProv==='openai_compat'){
+      const msgs=[{role:'user',content:parts.map(p=>p.inlineData
+        ?{type:'image_url',image_url:{url:'data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data}}
+        :{type:'text',text:p.text})}];
+      const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+        body:JSON.stringify({model:'gpt-4o',messages:msgs,max_tokens:1500,temperature:0.9})});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+      const d=await r.json();
+      text=d.choices?.[0]?.message?.content||'';
+    } else if(currentProv==='anthropic'){
+      const msgs=[{role:'user',content:parts.map(p=>p.inlineData
+        ?{type:'image',source:{type:'base64',media_type:p.inlineData.mimeType,data:p.inlineData.data}}
+        :{type:'text',text:p.text})}];
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-opus-4-6',max_tokens:1500,messages:msgs})});
+      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+      const d=await r.json();
+      text=d.content?.[0]?.text||'';
+    }
+    if(!text)throw new Error('AI не вернул ответ');
     document.getElementById('warmupConceptResult').textContent=text;
+    document.getElementById('warmupConceptEdit').value=text;
     document.getElementById('warmupStep1').style.display='none';
     document.getElementById('warmupStep2').style.display='block';
     S.warmupConcept=text;
@@ -1881,7 +1921,7 @@ async function genWarmupConcept(){
 }
 
 function applyWarmupConcept(){
-  const concept=S.warmupConcept||'';
+  const concept=document.getElementById('warmupConceptEdit')?.value||S.warmupConcept||'';
   // Извлекаем тему карусели из концепции
   const lines=concept.split('\n').filter(l=>l.trim());
   const topicLine=lines.find(l=>/ТЕМА|тема/i.test(l));
@@ -1891,8 +1931,7 @@ function applyWarmupConcept(){
   // Вставляем концепцию в поле фактов чтобы AI использовал её
   const factsEl=document.getElementById('carFacts');
   if(factsEl)factsEl.value='Используй эту концепцию прогрева:\n'+concept;
-  closeWarmupModal();
-  // Автоматически запускаем генерацию слайдов
+  closeWarmupModal(false); // не сбрасываем тип — остаёмся в warmup
   genSlides();
 }
 function setFn(f,el){S.funnel=f;setActive(el);}
@@ -2336,6 +2375,17 @@ ${extra ? 'Дополнительные темы: '+extra : ''}
 }
 
 // ── ИСПОЛЬЗОВАТЬ ПОВОД КАК ОСНОВУ ──
+function useOccasionByIndex(i,type){
+  if(type==='news'){
+    const item=S.occasionNews&&S.occasionNews[i];
+    if(!item)return;
+    useOccasion(item.title+': '+item.idea);
+  } else {
+    const item=S.occasionEvents&&S.occasionEvents[i];
+    if(!item)return;
+    useOccasion(item.title+' '+item.date+': '+item.idea);
+  }
+}
 function useOccasion(text) {
   // Удаляем предыдущую модалку если была
   document.getElementById('occUseModal')?.remove();
