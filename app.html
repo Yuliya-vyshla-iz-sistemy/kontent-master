@@ -558,7 +558,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 
 <!-- МОДАЛКА: ПОСТЕР К ПОСТУ -->
 <div id="posterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closePosterModal()">
-  <div style="background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:24px 20px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+  <div style="--border:#4E3D56;--text-main:#F0E9DE;--text-muted:#B7AFA4;--text-hint:#7A6E68;--input-bg:#2B2622;--tag-active-bg:rgba(224,163,62,0.12);--tag-active-color:#E0A33E;--tag-active-border:#E0A33E;background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:24px 20px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:18px">🎨 Постер к тексту</div>
 
     <div class="form-group">
@@ -610,6 +610,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="form-group" style="margin-top:12px">
       <label class="form-label">Доп. указания (необязательно)</label>
       <input id="posterHint" class="form-input" placeholder="например: тёплое освещение, без людей, акцент на тексте...">
+    </div>
+
+    <div id="posterPhotoGroup" style="display:none;margin-top:14px;padding:10px 12px;background:rgba(224,163,62,0.08);border:1px solid rgba(224,163,62,0.2);border-radius:10px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82em">
+        <input type="checkbox" id="posterUsePhoto" style="width:16px;height:16px">
+        Использовать моё фото как референс (AI нарисует постер с тобой)
+      </label>
+      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Работает только с Gemini Image AI. Выбери его в Настройках, если ещё не выбран.</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px">
@@ -712,7 +720,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 
 <!-- МОДАЛКА: СТИЛЬ AI-ОБЛОЖКИ КАРУСЕЛИ -->
 <div id="coverStyleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeCoverStyleModal()">
-  <div style="background:#1e1a17;border-radius:16px;max-width:480px;margin:0 auto;padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+  <div style="--border:#4E3D56;--text-main:#F0E9DE;--text-muted:#B7AFA4;--text-hint:#7A6E68;--input-bg:#2B2622;--tag-active-bg:rgba(224,163,62,0.12);--tag-active-color:#E0A33E;--tag-active-border:#E0A33E;background:#1e1a17;border-radius:16px;max-width:480px;margin:0 auto;padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:18px">🎨 Стиль AI-обложки</div>
 
     <div class="form-group">
@@ -740,6 +748,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <input id="coverStyleHint" class="form-input" placeholder="например: тёплое освещение, без людей...">
     </div>
 
+    <div id="coverPhotoGroup" style="display:none;margin-top:14px;padding:10px 12px;background:rgba(224,163,62,0.08);border:1px solid rgba(224,163,62,0.2);border-radius:10px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82em">
+        <input type="checkbox" id="coverUsePhoto" style="width:16px;height:16px">
+        Использовать моё фото как референс (AI нарисует обложку с тобой)
+      </label>
+      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Работает только с Gemini Image AI.</div>
+    </div>
+
     <div style="display:flex;gap:10px;margin-top:18px">
       <button class="btn btn-secondary" style="flex:1" onclick="closeCoverStyleModal()">Отмена</button>
       <button class="btn btn-primary" style="flex:2" id="btnGenCover" onclick="genAiCoverStyled()"><span class="btn-text">✦ Создать обложку</span><div class="spinner"></div></button>
@@ -749,12 +765,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
 
 <!-- МОДАЛКА: ПРОГРЕВ ИЗ ФОТО -->
 <div id="warmupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:1000;overflow-y:auto;padding:20px 0" onclick="if(event.target===this)closeWarmupModal()">
-  <div style="background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:28px 24px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
+  <div style="--border:#4E3D56;--text-main:#F0E9DE;--text-muted:#B7AFA4;--text-hint:#7A6E68;--input-bg:#2B2622;--tag-active-bg:rgba(224,163,62,0.12);--tag-active-color:#E0A33E;--tag-active-border:#E0A33E;background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:28px 24px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
     <button onclick="closeWarmupModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1">×</button>
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:6px">📸 Прогрев из фото</div>
     <div style="font-size:.82em;color:var(--text-muted);margin-bottom:12px">Загрузи фото из жизни → AI придумает прогрев → карусель + пост</div>
     <div style="background:rgba(224,163,62,0.1);border:1px solid rgba(224,163,62,0.25);border-radius:10px;padding:10px 12px;font-size:.76em;color:var(--text-muted);line-height:1.5;margin-bottom:20px">
-      ⚠️ Этот модуль анализирует фото, поэтому работает только с AI, которые умеют «видеть» изображения: <b style="color:#E0A33E">OpenAI (GPT-4o)</b>, <b style="color:#E0A33E">Gemini</b> или <b style="color:#E0A33E">Claude</b>. Выбери один из них в Настройках AI и убедись, что ключ сохранён — иначе шаг «Придумать концепцию» выдаст ошибку.
+      ⚠️ Этот модуль сначала «смотрит» на фото (нужен ключ OpenAI или Gemini — либо в блоке <b style="color:#E0A33E">Image AI</b>, либо как основной AI), а затем пишет текст твоим обычным AI (DeepSeek и любой другой подойдёт). Если Image AI не подключён — выбери GPT-4o, Gemini или Claude как основной AI в Настройках.
     </div>
 
     <!-- Шаг 1: загрузка фото -->
@@ -1239,8 +1255,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       </div>
       <div class="pcard" onclick="selImgProv('gemini_img',this)">
         <div class="pcard-badge warn">VPN/агр.</div>
-        <div class="pcard-name">Gemini Flash Image</div>
-        <div class="pcard-models">Gemini 2.5 Flash Image · ~$0.04/фото</div>
+        <div class="pcard-name">Gemini (Nano Banana 2)</div>
+        <div class="pcard-models">Nano Banana 2 / Pro · ~$0.07–0.15/фото</div>
       </div>
       <div class="pcard" onclick="selImgProv('genapi_img',this)">
         <div class="pcard-badge">Россия ✓</div>
@@ -1268,7 +1284,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <option value="standard">Стандарт — быстрее и дешевле</option>
         <option value="hd">Высокое качество — дороже, детальнее</option>
       </select>
-      <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);">Сейчас влияет только на OpenAI Images (DALL·E 3). Для остальных провайдеров разницы в цене нет — они всегда выдают максимум.</div>
+      <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);">OpenAI: DALL·E 3 стандарт/HD. Gemini: Nano Banana 2 (стандарт) / Nano Banana Pro (высокое — точнее текст, до 4K, дороже). Для GenAPI/Kandinsky разницы нет.</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="saveImgKey()">💾 Сохранить Image-ключ</button>
@@ -1334,7 +1350,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <table class="key-table">
         <tr><th>Провайдер</th><th>Где взять ключ</th><th>Россия</th><th>Особенности</th></tr>
         <tr><td><strong>OpenAI Images</strong></td><td><a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a></td><td>⚠️ VPN/GenAPI</td><td>Лучший русский текст на картинках</td></tr>
-        <tr><td><strong>Google Imagen</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Высокое качество, реализм</td></tr>
+        <tr><td><strong>Gemini (Nano Banana)</strong></td><td><a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a></td><td>⚠️ VPN</td><td>Высокое качество, реализм. Есть переключатель «Высокое качество» — рисует точнее и детальнее, но дороже</td></tr>
         <tr><td><strong>GenAPI.ru</strong></td><td><a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a></td><td>✅ Рубли</td><td>Midjourney, DALL·E, Flux — всё в одном</td></tr>
         <tr><td><strong>Kandinsky</strong></td><td><a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a></td><td>✅ Рубли</td><td>Бесплатный лимит ~100 запросов/день</td></tr>
       </table>
@@ -1363,6 +1379,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div><div class="instr-text"><strong>Режим критика</strong> — честный разбор готового текста. Не «всё хорошо», а конкретно: что слабо, почему, как исправить. Отличается от Скоринга тем, что даёт редакторские рекомендации, а не оценку.</div></div>
       <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="instr-text"><strong>Скоринг поста</strong> — числовая оценка готового поста по 6 критериям (хук, воронка, сохранения, эмоция, CTA, вирусность) <em>до публикации</em>. Максимум 60 баллов. Используй, когда написал пост и хочешь понять, насколько он сильный и что улучшить перед публикацией.</div></div>
       <div class="instr-step"><div class="instr-num"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="instr-text"><strong>SMM Планер</strong> — раздел «Контент-план» генерирует идеи постов на 7 дней по выбранным форматам. Кнопка <strong>SMMplanner</strong> в конце копирует текст плана и открывает сервис для планирования публикаций по расписанию. Max, VK, Telegram — ссылки в нижней части страницы, чтобы быстро перейти в нужный мессенджер.</div></div>
+      <div class="instr-step"><div class="instr-num">📸</div><div class="instr-text"><strong>Прогрев из фото</strong> (внутри «Создать карусель» → «Прогрев из фото») — загрузи до 5 фото из жизни, опиши что на них → AI сначала «смотрит» на фото (нужен ключ OpenAI или Gemini — в блоке Image AI, либо как основной AI), затем пишет тему, хук, план слайдов и пост твоим обычным текстовым AI (подходит и DeepSeek). Дальше карусель собирается как обычно.</div></div>
     </div>
   </div>
   <div class="card">
@@ -1381,6 +1398,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <p style="margin-bottom:10px"><strong style="color:var(--terra)">Логотип не появляется на слайдах?</strong><br>Убедись что логотип загружен в Профиле автора → раздел «Логотип и фото». После загрузки видна превью — значит сохранено.</p>
       <div class="divider" style="margin:12px 0"></div>
       <p><strong style="color:var(--terra)">AI-обложка не генерируется?</strong><br>Проверь что в Настройках AI → блок Image AI — выбран провайдер и сохранён ключ. Типографская обложка работает всегда без ключа.</p>
+      <div class="divider" style="margin:12px 0"></div>
+      <p style="margin-bottom:10px"><strong style="color:var(--terra)">Можно нарисовать обложку/постер «с собой» на фото?</strong><br>Да — если загрузила своё фото в Профиле, в модалках «AI-обложка» и «Постер к тексту» появится чекбокс «Использовать моё фото как референс». AI будет ориентироваться на твою внешность при генерации. Работает только с Gemini (Nano Banana) — у OpenAI DALL·E такой возможности нет технически.</p>
+      <div class="divider" style="margin:12px 0"></div>
+      <p><strong style="color:var(--terra)">«Прогрев из фото» пишет «Нужен AI, умеющий видеть фото»?</strong><br>Загрузи ключ OpenAI или Gemini в блок Image AI (Настройки → Image AI) — тогда фото анализирует он, а текст пишет твой обычный AI (даже DeepSeek). Если Image AI не подключён — выбери GPT-4o, Gemini или Claude как основной текстовый AI.</p>
     </div>
   </div>
 </div>
@@ -1849,6 +1870,57 @@ function warmupRemovePhoto(i){
   renderWarmupPreview();
 }
 
+// Источник vision-ключа для анализа фото. Приоритет: Image AI ключ (OpenAI/Gemini) → основной текстовый AI, если сам умеет vision.
+function getVisionSource(){
+  const imgProv=getActiveImgProv(),imgKey=getImgKey();
+  if(imgKey&&imgProv==='openai_img')return{type:'openai',key:imgKey};
+  if(imgKey&&imgProv==='gemini_img')return{type:'gemini',key:imgKey};
+  const textProv=S.provider||'deepseek',textKey=getKey();
+  if(textKey&&['openai','gemini','claude'].includes(textProv))return{type:textProv,key:textKey};
+  return null;
+}
+
+// Шаг 1: смотрит на фото и просто описывает их — без сочинения текста карусели
+async function describeWarmupPhotos(context){
+  const vs=getVisionSource();
+  if(!vs)throw new Error('Нужен AI, умеющий "видеть" фото: подключи ключ OpenAI или Gemini в блоке Image AI, либо выбери GPT-4o/Gemini/Claude как основной AI в Настройках');
+  const instruction=`Опиши коротко и по делу, что на этих фото (${warmupPhotos.length} шт.): обстановка, действие, настроение, детали, которые можно использовать в посте. Контекст от автора: ${context||'не указан'}. Пиши 3-5 предложений на русском, без markdown, без домыслов о том чего не видно на фото.`;
+  const parts=[{text:instruction}];
+  warmupPhotos.forEach(ph=>parts.push({inlineData:{mimeType:ph.mime,data:ph.b64}}));
+
+  if(vs.type==='gemini'){
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key='+vs.key,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.4,maxOutputTokens:1000,thinkingConfig:{thinkingLevel:'minimal'}}})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+    const d=await r.json();
+    return d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
+  }
+  if(vs.type==='openai'){
+    const msgs=[{role:'user',content:parts.map(p=>p.inlineData
+      ?{type:'image_url',image_url:{url:'data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data}}
+      :{type:'text',text:p.text})}];
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+vs.key},
+      body:JSON.stringify({model:'gpt-4o',messages:msgs,max_tokens:800,temperature:0.4})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+    const d=await r.json();
+    return d.choices?.[0]?.message?.content||'';
+  }
+  if(vs.type==='claude'){
+    const msgs=[{role:'user',content:parts.map(p=>p.inlineData
+      ?{type:'image',source:{type:'base64',media_type:p.inlineData.mimeType,data:p.inlineData.data}}
+      :{type:'text',text:p.text})}];
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':vs.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-5',max_tokens:800,messages:msgs})});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
+    const d=await r.json();
+    return d.content?.[0]?.text||'';
+  }
+  throw new Error('Провайдер не поддерживается для анализа фото');
+}
+
 async function genWarmupConcept(){
   if(!warmupPhotos.length){toast('Загрузи хотя бы одно фото','err');return;}
   const context=document.getElementById('warmupContext').value.trim();
@@ -1861,11 +1933,13 @@ async function genWarmupConcept(){
   const niche=p.niche||'эксперт';
   const tone=p.tone||'дружелюбный, живой';
 
-  // Собираем контент для Gemini Vision
-  const parts=[
-    {text:`Ты — эксперт по контент-маркетингу. Тебе прислали ${warmupPhotos.length} фото из жизни автора.
+  try{
+    const description=await describeWarmupPhotos(context);
+    if(!description)throw new Error('AI не смог описать фото');
+
+    const prompt=`Ты — эксперт по контент-маркетингу. Вот описание фото из жизни автора: ${description}
 Ниша автора: ${niche}. Голос бренда: ${tone}.
-Контекст фото: ${context||'обычный день автора'}.
+Контекст от автора: ${context||'обычный день автора'}.
 Платформа: ${platformName}.
 
 Придумай концепцию прогрева-карусели на основе этих фото:
@@ -1874,54 +1948,8 @@ async function genWarmupConcept(){
 3. ПЛАН СЛАЙДОВ (5-7 слайдов, заголовок каждого)
 4. ПОСТ К КАРУСЕЛИ (короткий, 3-4 абзаца, живым языком, без markdown)
 
-Пиши конкретно, под нишу автора. Не используй слова "эксперт", "специалист". НЕ используй markdown-разметку.`}
-  ];
-
-  // Добавляем фото
-  warmupPhotos.forEach(ph=>{
-    parts.push({inlineData:{mimeType:ph.mime,data:ph.b64}});
-  });
-
-  // Определяем провайдер с поддержкой vision
-  const visionProviders=['openai','gemini','claude'];
-  const currentProv=S.provider||'deepseek';
-  if(!visionProviders.includes(currentProv)){
-    toast('Прогрев из фото требует GPT, Gemini или Claude — выбери в Настройках AI','err');
-    load(btn,false);return;
-  }
-  const k=getKey()||'';
-  if(!k){toast('Нет ключа для выбранного AI — добавь его в Настройках AI','err');load(btn,false);return;}
-
-  try{
-    let text='';
-    if(currentProv==='gemini'||currentProv==='gemini_img'){
-      const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+k,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{parts}],generationConfig:{temperature:0.9,maxOutputTokens:1500}})});
-      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
-      const d=await r.json();
-      text=d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
-    } else if(currentProv==='openai'){
-      const msgs=[{role:'user',content:parts.map(p=>p.inlineData
-        ?{type:'image_url',image_url:{url:'data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data}}
-        :{type:'text',text:p.text})}];
-      const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
-        body:JSON.stringify({model:'gpt-4o',messages:msgs,max_tokens:1500,temperature:0.9})});
-      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
-      const d=await r.json();
-      text=d.choices?.[0]?.message?.content||'';
-    } else if(currentProv==='anthropic'){
-      const msgs=[{role:'user',content:parts.map(p=>p.inlineData
-        ?{type:'image',source:{type:'base64',media_type:p.inlineData.mimeType,data:p.inlineData.data}}
-        :{type:'text',text:p.text})}];
-      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model:'claude-sonnet-5',max_tokens:1500,messages:msgs})});
-      if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
-      const d=await r.json();
-      text=d.content?.[0]?.text||'';
-    }
+Пиши конкретно, под нишу автора. Не используй слова "эксперт", "специалист". НЕ используй markdown-разметку.`;
+    const text=await callAI(prompt);
     if(!text)throw new Error('AI не вернул ответ');
     document.getElementById('warmupConceptResult').textContent=text;
     document.getElementById('warmupConceptEdit').value=text;
@@ -1934,17 +1962,30 @@ async function genWarmupConcept(){
   }finally{load(btn,false);}
 }
 
+
 function applyWarmupConcept(){
   const concept=document.getElementById('warmupConceptEdit')?.value||S.warmupConcept||'';
-  // Извлекаем тему карусели из концепции
-  const lines=concept.split('\n').filter(l=>l.trim());
-  const topicLine=lines.find(l=>/ТЕМА|тема/i.test(l));
-  const topic=topicLine?topicLine.replace(/.*[:：]/,'').trim():lines[0]||'Прогрев из жизни';
-  // Вставляем тему в поле и закрываем модалку
+  // Достаём секции по заголовкам, независимо от нумерации AI
+  const extract=(label,nextLabels)=>{
+    const re=new RegExp('(?:^|\\n)\\s*\\d*[.)]?\\s*'+label+'[^\\n]*\\n([\\s\\S]*?)(?=\\n\\s*\\d*[.)]?\\s*(?:'+nextLabels.join('|')+')|$)','i');
+    const m=concept.match(re);
+    return m?m[1].trim():'';
+  };
+  const topic=extract('ТЕМА КАРУСЕЛИ',['ХУК ОБЛОЖКИ','ПЛАН СЛАЙДОВ','ПОСТ К КАРУСЕЛИ'])||concept.split('\n').find(l=>l.trim())||'Прогрев из жизни';
+  const hook=extract('ХУК ОБЛОЖКИ',['ПЛАН СЛАЙДОВ','ПОСТ К КАРУСЕЛИ']);
+  const plan=extract('ПЛАН СЛАЙДОВ',['ПОСТ К КАРУСЕЛИ']);
+  const post=extract('ПОСТ К КАРУСЕЛИ',[]);
+  // Вставляем тему и хук в соответствующие поля
   document.getElementById('carTopic').value=topic;
-  // Вставляем концепцию в поле фактов чтобы AI использовал её
+  S.selHook=hook||topic;
+  // В факты — только план и черновик поста, без дублирования темы/хука
   const factsEl=document.getElementById('carFacts');
-  if(factsEl)factsEl.value='Используй эту концепцию прогрева:\n'+concept;
+  if(factsEl){
+    let facts='';
+    if(plan)facts+='План слайдов от AI:\n'+plan;
+    if(post)facts+=(facts?'\n\n':'')+'Черновик поста от AI:\n'+post;
+    factsEl.value=facts;
+  }
   closeWarmupModal(false); // не сбрасываем тип — остаёмся в warmup
   genSlides();
 }
@@ -1966,7 +2007,7 @@ const PROV={
   deepseek:{name:'DeepSeek',url:'https://api.deepseek.com/v1/chat/completions',model:'deepseek-chat',hint:'Ключ: <a href="https://platform.deepseek.com/api_keys" target="_blank" class="instr-link">platform.deepseek.com</a> — бесплатно, из РФ'},
   claude:{name:'Claude',url:'https://api.anthropic.com/v1/messages',model:'claude-sonnet-5',hint:'Ключ: <a href="https://console.anthropic.com" target="_blank" class="instr-link">console.anthropic.com</a> — из РФ через GenAPI или VPN'},
   openai:{name:'OpenAI',url:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini:{name:'Gemini',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',model:'gemini-2.5-flash',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ с VPN'},
+  gemini:{name:'Gemini',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent',model:'gemini-3-flash-preview',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ с VPN'},
   grok:{name:'Grok',url:'https://api.x.ai/v1/chat/completions',model:'grok-3',hint:'Ключ: <a href="https://console.x.ai/" target="_blank" class="instr-link">console.x.ai</a> — работает из РФ'},
   yandex:{name:'YandexGPT',url:'https://llm.api.cloud.yandex.net/foundationModels/v1/completion',model:'yandexgpt',hint:'Ключ: <a href="https://console.yandex.cloud/" target="_blank" class="instr-link">console.yandex.cloud</a> — рубли'},
   genapi:{name:'GenAPI.ru',url:'https://api.gen-api.ru/api/v1/networks/openai/chat/completions',model:'gpt-4o',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели, рубли'},
@@ -1976,7 +2017,7 @@ const PROV={
 // IMAGE ПРОВАЙДЕРЫ — 4 штуки
 const IMGPROV={
   openai_img:{name:'OpenAI Images',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini_img:{name:'Gemini Flash Image',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN. Платно ~$0.04/фото.'},
+  gemini_img:{name:'Gemini (Nano Banana 2)',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ через VPN. ~$0.07/фото (1K), высокое качество — дороже.'},
   genapi_img:{name:'GenAPI.ru',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели картинок, рубли, из РФ'},
   kandinsky:{name:'Kandinsky (Сбер)',hint:'Ключ: <a href="https://developers.sber.ru/" target="_blank" class="instr-link">developers.sber.ru</a> → GigaChat API → Kandinsky'}
 };
@@ -2040,7 +2081,7 @@ async function callAI(prompt,sys,maxTokensOverride){
     return (await r.json()).content[0].text;
   }
   if(S.provider==='gemini'){
-    const r=await fetch(p.url+'?key='+k,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:system+'\n\n'+prompt}]}],generationConfig:{temperature:temp,maxOutputTokens:maxT}})});
+    const r=await fetch(p.url+'?key='+k,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:system+'\n\n'+prompt}]}],generationConfig:{temperature:temp,maxOutputTokens:Math.max(maxT,3000),thinkingConfig:{thinkingLevel:'minimal'}}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     return (await r.json()).candidates[0].content.parts[0].text;
   }
@@ -2051,8 +2092,12 @@ async function callAI(prompt,sys,maxTokensOverride){
   throw new Error('Провайдер не поддерживается');
 }
 
+// Выбор модели Gemini Image по настройке качества: Nano Banana 2 (дефолт) или Nano Banana Pro (высокое качество)
+function geminiImgModel(){return (localStorage.getItem('imgQuality')==='hd')?'gemini-3-pro-image':'gemini-3.1-flash-image';}
+
 // ВЫЗОВ IMAGE AI — рабочий код для всех 4 провайдеров
-async function callImageAI(prompt){
+// refPhoto (необязательно): {mime,data} — референс-фото автора для image-to-image (только Gemini)
+async function callImageAI(prompt,refPhoto){
   const prov=getActiveImgProv(),k=getImgKey();
   if(!k)throw new Error('Нет Image API-ключа. Зайди в Настройки AI → блок Image AI.');
 
@@ -2065,18 +2110,22 @@ async function callImageAI(prompt){
     const d=await r.json();return d.data[0].url;
   }
 
-  // Gemini 2.5 Flash Image
+  // Gemini Image — Nano Banana 2 / Pro
   if(prov==='gemini_img'){
-    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+k,{
+    const parts=[];
+    if(refPhoto)parts.push({inlineData:{mimeType:refPhoto.mime,data:refPhoto.data}});
+    parts.push({text:prompt});
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiImgModel()+':generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}})});
+      body:JSON.stringify({contents:[{parts}],generationConfig:{responseModalities:['IMAGE','TEXT'],imageConfig:{aspectRatio:'9:16'}}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d=await r.json();
-    const parts=d.candidates?.[0]?.content?.parts||[];
-    const imgPart=parts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+    const rparts=d.candidates?.[0]?.content?.parts||[];
+    const imgPart=rparts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
     if(!imgPart)throw new Error('Gemini не вернул картинку');
     return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
   }
+
 
   // GenAPI.ru — через OpenAI-совместимый endpoint с моделью Flux
   if(prov==='genapi_img'){
@@ -2490,11 +2539,21 @@ function openPosterModal() {
   if(!getImgKey()){toast('Подключи Image AI в настройках','err');return;}
   document.getElementById('posterModal').style.display='block';
   document.body.style.overflow='hidden';
+  const grp=document.getElementById('posterPhotoGroup');
+  if(grp)grp.style.display=localStorage.getItem('asset_photo')?'block':'none';
 }
 
 function closePosterModal() {
   document.getElementById('posterModal').style.display='none';
   document.body.style.overflow='';
+}
+
+// Парсит сохранённое фото автора (data URL) в {mime,data} для передачи как референс в Gemini
+function getAuthorPhotoRef(){
+  const d=localStorage.getItem('asset_photo');
+  if(!d)return null;
+  const m=d.match(/^data:([^;]+);base64,(.+)$/);
+  return m?{mime:m[1],data:m[2]}:null;
 }
 
 async function genPostPoster() {
@@ -2504,15 +2563,24 @@ async function genPostPoster() {
   const format = document.getElementById('posterFormat').value;
   const variants = parseInt(document.getElementById('posterVariants').value);
   const hint = document.getElementById('posterHint').value.trim();
+  const usePhoto = document.getElementById('posterUsePhoto')?.checked||false;
   const p = getProfile();
   const styleDesc = VIS_STYLES[posterVisStyle] || VIS_STYLES.photorealism;
+
+  let refPhoto=null;
+  if(usePhoto){
+    if(getActiveImgProv()!=='gemini_img'){toast('Фото-референс работает только с Gemini Image AI — выбери его в Настройках','err');load(btn,false);return;}
+    refPhoto=getAuthorPhotoRef();
+    if(!refPhoto){toast('Фото автора не найдено — загрузи его в Профиле','err');load(btn,false);return;}
+  }
 
   // Берём первые 120 символов поста как суть
   const essence = postText.replace(/\n/g,' ').slice(0,120);
 
   let prompt = `Social media visual poster, ${format} format. Style: ${styleDesc}. `;
   prompt += `Post theme: "${essence}". `;
-  if(p.name) prompt += `Author: ${p.name}. `;
+  if(refPhoto) prompt += `Use the provided reference photo to depict the same person accurately in the scene. `;
+  else if(p.name) prompt += `Author: ${p.name}. `;
   prompt += `Brand colors: deep eggplant #3A2A4D, terracotta #C25A3E, amber #E0A33E. `;
   prompt += `Professional, clean, Instagram-ready. No text overlay. `;
   if(hint) prompt += hint + '. ';
@@ -2524,7 +2592,7 @@ async function genPostPoster() {
   try {
     const imgs = [];
     for(let i=0;i<variants;i++) {
-      const url = await callImageAIWithFormat(prompt, format);
+      const url = await callImageAIWithFormat(prompt, format, refPhoto);
       imgs.push(url);
     }
     wrap.innerHTML = '';
@@ -2554,6 +2622,8 @@ function openCoverStyleModal() {
   if(!getImgKey()){toast('Подключи Image AI в настройках','err');return;}
   document.getElementById('coverStyleModal').style.display='block';
   document.body.style.overflow='hidden';
+  const grp=document.getElementById('coverPhotoGroup');
+  if(grp)grp.style.display=localStorage.getItem('asset_photo')?'block':'none';
 }
 
 function closeCoverStyleModal() {
@@ -2566,17 +2636,26 @@ async function genAiCoverStyled() {
   const btn = document.getElementById('btnAiCover'); load(btn,true);
   const wrap = document.getElementById('coverResult');
   const hint = document.getElementById('coverStyleHint').value.trim();
+  const usePhoto = document.getElementById('coverUsePhoto')?.checked||false;
   const styleDesc = VIS_STYLES[coverVisStyle] || VIS_STYLES.photorealism;
   const p = getProfile();
 
+  let refPhoto=null;
+  if(usePhoto){
+    if(getActiveImgProv()!=='gemini_img'){toast('Фото-референс работает только с Gemini Image AI — выбери его в Настройках','err');load(btn,false);return;}
+    refPhoto=getAuthorPhotoRef();
+    if(!refPhoto){toast('Фото автора не найдено — загрузи его в Профиле','err');load(btn,false);return;}
+  }
+
   let prompt = `Social media carousel cover, 9:16 vertical format. Style: ${styleDesc}. `;
   prompt += `Title text: "${S.selHook||'Обложка'}". `;
-  if(p.name) prompt += `Author: ${p.name}. `;
+  if(refPhoto) prompt += `Use the provided reference photo to depict the same person accurately in the scene. `;
+  else if(p.name) prompt += `Author: ${p.name}. `;
   prompt += `Brand colors: #3A2A4D, #C25A3E, #E0A33E. Professional, clean. `;
   if(hint) prompt += hint + '. ';
 
   try {
-    const url = await callImageAIWithFormat(prompt, '9:16');
+    const url = await callImageAIWithFormat(prompt, '9:16', refPhoto);
     wrap.innerHTML = '';
     const card = document.createElement('div');
     card.style.cssText = 'display:inline-block';
@@ -2593,7 +2672,8 @@ async function genAiCoverStyled() {
 }
 
 // ── callImageAI с учётом формата ──
-async function callImageAIWithFormat(prompt, format) {
+// refPhoto (необязательно): {mime,data} — референс-фото автора для image-to-image (только Gemini)
+async function callImageAIWithFormat(prompt, format, refPhoto) {
   const prov = getActiveImgProv(), k = getImgKey();
   if(!k) throw new Error('Нет Image API-ключа. Зайди в Настройки AI → Image AI.');
 
@@ -2608,13 +2688,16 @@ async function callImageAIWithFormat(prompt, format) {
   }
 
   if(prov==='gemini_img') {
-    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key='+k,{
+    const parts=[];
+    if(refPhoto)parts.push({inlineData:{mimeType:refPhoto.mime,data:refPhoto.data}});
+    parts.push({text:prompt});
+    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiImgModel()+':generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}})});
+      body:JSON.stringify({contents:[{parts}],generationConfig:{responseModalities:['IMAGE','TEXT'],imageConfig:{aspectRatio:format||'9:16'}}})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d = await r.json();
-    const parts=d.candidates?.[0]?.content?.parts||[];
-    const imgPart=parts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+    const rparts=d.candidates?.[0]?.content?.parts||[];
+    const imgPart=rparts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
     if(!imgPart) throw new Error('Gemini не вернул картинку');
     return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
   }
@@ -2666,7 +2749,7 @@ function buildImagePrompt(){
 }
 
 // ПРОВЕРКА
-async function testConn(){const k=getKey();if(!k){toast('Введи и сохрани ключ','err');return;}const el=document.getElementById('testRes');el.style.cssText='display:block;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:.82em;background:var(--bg2);border:1px solid var(--border)';el.textContent='🔄 Проверяю...';try{const r=await callAI('Ответь одним словом: работаю');el.style.background='rgba(74,158,74,0.1)';el.style.borderColor='rgba(74,158,74,0.4)';el.textContent='✅ Работает! Ответ: '+r.slice(0,60);localStorage.setItem('activeProvider',S.provider);updateBadge();}catch(e){el.style.background='rgba(194,90,62,0.1)';el.style.borderColor='rgba(194,90,62,0.4)';el.textContent='❌ Ошибка: '+e.message;}}
+async function testConn(){const k=getKey();if(!k){toast('Введи и сохрани ключ','err');return;}const el=document.getElementById('testRes');el.style.cssText='display:block;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:.82em;background:var(--bg2);border:1px solid var(--border)';el.textContent='🔄 Проверяю...';try{await callAI('Ответь одним словом: работаю');el.style.background='rgba(74,158,74,0.1)';el.style.borderColor='rgba(74,158,74,0.4)';el.textContent='✅ Ключ работает и авторизован';localStorage.setItem('activeProvider',S.provider);updateBadge();}catch(e){el.style.background='rgba(194,90,62,0.1)';el.style.borderColor='rgba(194,90,62,0.4)';el.textContent='❌ Ошибка: '+e.message;}}
 
 // ПОСТ
 async function genPost(adapt3){
