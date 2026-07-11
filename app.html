@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Контент-Мастер · Вышла из системы</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -749,7 +752,10 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   <div style="background:#1e1a17;border-radius:16px;max-width:520px;margin:0 auto;padding:28px 24px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,0.8);border:1px solid rgba(255,255,255,0.08)">
     <button onclick="closeWarmupModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1">×</button>
     <div style="font-family:Spectral,serif;font-size:1.25em;font-weight:700;color:#E0A33E;margin-bottom:6px">📸 Прогрев из фото</div>
-    <div style="font-size:.82em;color:var(--text-muted);margin-bottom:20px">Загрузи фото из жизни → AI придумает прогрев → карусель + пост</div>
+    <div style="font-size:.82em;color:var(--text-muted);margin-bottom:12px">Загрузи фото из жизни → AI придумает прогрев → карусель + пост</div>
+    <div style="background:rgba(224,163,62,0.1);border:1px solid rgba(224,163,62,0.25);border-radius:10px;padding:10px 12px;font-size:.76em;color:var(--text-muted);line-height:1.5;margin-bottom:20px">
+      ⚠️ Этот модуль анализирует фото, поэтому работает только с AI, которые умеют «видеть» изображения: <b style="color:#E0A33E">OpenAI (GPT-4o)</b>, <b style="color:#E0A33E">Gemini</b> или <b style="color:#E0A33E">Claude</b>. Выбери один из них в Настройках AI и убедись, что ключ сохранён — иначе шаг «Придумать концепцию» выдаст ошибку.
+    </div>
 
     <!-- Шаг 1: загрузка фото -->
     <div id="warmupStep1">
@@ -1255,6 +1261,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <label class="form-label">Secret Key <span style="font-size:.75em;color:var(--text-muted)">(только для Kandinsky)</span></label>
       <input class="form-input" id="imgSecretKey" type="password" placeholder="Secret Key от fusionbrain.ai" autocomplete="off">
       <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);">Оба ключа нужны для Kandinsky — найди в личном кабинете fusionbrain.ai → API.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Качество изображения</label>
+      <select class="form-select" id="imgQuality" onchange="localStorage.setItem('imgQuality',this.value)">
+        <option value="standard">Стандарт — быстрее и дешевле</option>
+        <option value="hd">Высокое качество — дороже, детальнее</option>
+      </select>
+      <div style="margin-top:7px;font-size:.76em;color:var(--text-hint);">Сейчас влияет только на OpenAI Images (DALL·E 3). Для остальных провайдеров разницы в цене нет — они всегда выдают максимум.</div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-primary" onclick="saveImgKey()">💾 Сохранить Image-ключ</button>
@@ -1869,13 +1883,13 @@ async function genWarmupConcept(){
   });
 
   // Определяем провайдер с поддержкой vision
-  const visionProviders=['openai','openai_compat','gemini','anthropic','gemini_img'];
+  const visionProviders=['openai','gemini','claude'];
   const currentProv=S.provider||'deepseek';
   if(!visionProviders.includes(currentProv)){
     toast('Прогрев из фото требует GPT, Gemini или Claude — выбери в Настройках AI','err');
     load(btn,false);return;
   }
-  const k=localStorage.getItem('apikey_'+currentProv)||getImgKey()||'';
+  const k=getKey()||'';
   if(!k){toast('Нет ключа для выбранного AI — добавь его в Настройках AI','err');load(btn,false);return;}
 
   try{
@@ -1887,7 +1901,7 @@ async function genWarmupConcept(){
       if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
       const d=await r.json();
       text=d.candidates?.[0]?.content?.parts?.find(p=>p.text)?.text||'';
-    } else if(currentProv==='openai'||currentProv==='openai_compat'){
+    } else if(currentProv==='openai'){
       const msgs=[{role:'user',content:parts.map(p=>p.inlineData
         ?{type:'image_url',image_url:{url:'data:'+p.inlineData.mimeType+';base64,'+p.inlineData.data}}
         :{type:'text',text:p.text})}];
@@ -1903,7 +1917,7 @@ async function genWarmupConcept(){
         :{type:'text',text:p.text})}];
       const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
         headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({model:'claude-opus-4-6',max_tokens:1500,messages:msgs})});
+        body:JSON.stringify({model:'claude-sonnet-5',max_tokens:1500,messages:msgs})});
       if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
       const d=await r.json();
       text=d.content?.[0]?.text||'';
@@ -1950,9 +1964,9 @@ function toggleTag(el){el.classList.toggle('active');}
 // ПРОВАЙДЕРЫ ТЕКСТА
 const PROV={
   deepseek:{name:'DeepSeek',url:'https://api.deepseek.com/v1/chat/completions',model:'deepseek-chat',hint:'Ключ: <a href="https://platform.deepseek.com/api_keys" target="_blank" class="instr-link">platform.deepseek.com</a> — бесплатно, из РФ'},
-  claude:{name:'Claude',url:'https://api.anthropic.com/v1/messages',model:'claude-sonnet-4-6',hint:'Ключ: <a href="https://console.anthropic.com" target="_blank" class="instr-link">console.anthropic.com</a> — из РФ через GenAPI или VPN'},
+  claude:{name:'Claude',url:'https://api.anthropic.com/v1/messages',model:'claude-sonnet-5',hint:'Ключ: <a href="https://console.anthropic.com" target="_blank" class="instr-link">console.anthropic.com</a> — из РФ через GenAPI или VPN'},
   openai:{name:'OpenAI',url:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini',hint:'Ключ: <a href="https://platform.openai.com/api-keys" target="_blank" class="instr-link">platform.openai.com</a> — из РФ через GenAPI или VPN'},
-  gemini:{name:'Gemini',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',model:'gemini-2.0-flash',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ с VPN'},
+  gemini:{name:'Gemini',url:'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',model:'gemini-2.5-flash',hint:'Ключ: <a href="https://aistudio.google.com/apikey" target="_blank" class="instr-link">aistudio.google.com</a> — из РФ с VPN'},
   grok:{name:'Grok',url:'https://api.x.ai/v1/chat/completions',model:'grok-3',hint:'Ключ: <a href="https://console.x.ai/" target="_blank" class="instr-link">console.x.ai</a> — работает из РФ'},
   yandex:{name:'YandexGPT',url:'https://llm.api.cloud.yandex.net/foundationModels/v1/completion',model:'yandexgpt',hint:'Ключ: <a href="https://console.yandex.cloud/" target="_blank" class="instr-link">console.yandex.cloud</a> — рубли'},
   genapi:{name:'GenAPI.ru',url:'https://api.gen-api.ru/api/v1/networks/openai/chat/completions',model:'gpt-4o',hint:'Ключ: <a href="https://gen-api.ru" target="_blank" class="instr-link">gen-api.ru</a> — все модели, рубли'},
@@ -2046,7 +2060,7 @@ async function callImageAI(prompt){
   if(prov==='openai_img'){
     const r=await fetch('https://api.openai.com/v1/images/generations',{method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
-      body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1024x1792',quality:'standard'})});
+      body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1024x1792',quality:(localStorage.getItem('imgQuality')||'standard')})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d=await r.json();return d.data[0].url;
   }
@@ -2567,7 +2581,10 @@ async function genAiCoverStyled() {
     const card = document.createElement('div');
     card.style.cssText = 'display:inline-block';
     card.innerHTML = `<img src="${url}" style="max-width:260px;border-radius:12px;display:block;border:1px solid var(--border)">
-      <a href="${url}" download="cover.jpg" class="btn btn-secondary" style="margin-top:6px;font-size:.78em;display:block;text-align:center;text-decoration:none">⬇ Скачать</a>`;
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <a href="${url}" download="cover.jpg" class="btn btn-secondary" style="flex:1;font-size:.78em;text-align:center;text-decoration:none">⬇ Скачать</a>
+        <button class="btn btn-secondary" style="flex:1;font-size:.78em" onclick="genAiCoverStyled()">🔄 Перегенерировать</button>
+      </div>`;
     wrap.appendChild(card);
     toast('AI-обложка готова ✓','ok');
   } catch(e) {
@@ -2585,7 +2602,7 @@ async function callImageAIWithFormat(prompt, format) {
     const size = sizes[format] || '1024x1792';
     const r = await fetch('https://api.openai.com/v1/images/generations',{method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
-      body:JSON.stringify({model:'dall-e-3',prompt,n:1,size,quality:'standard'})});
+      body:JSON.stringify({model:'dall-e-3',prompt,n:1,size,quality:(localStorage.getItem('imgQuality')||'standard')})});
     if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||'HTTP '+r.status);}
     const d = await r.json(); return d.data[0].url;
   }
@@ -3421,6 +3438,8 @@ function renderPlanHtml(text){
   if(ap&&PROV[ap]){S.provider=ap;document.getElementById('provLabel').textContent=PROV[ap].name;document.getElementById('keyHint').innerHTML='Как получить: '+PROV[ap].hint;document.getElementById('apiKey').value=localStorage.getItem('key_'+ap)||'';}
   const aip=localStorage.getItem('activeImgProvider');
   if(aip&&IMGPROV[aip]){S.imgProvider=aip;document.getElementById('imgProvLabel').textContent=IMGPROV[aip].name;document.getElementById('imgKeyHint').innerHTML='Как получить: '+IMGPROV[aip].hint;document.getElementById('imgApiKey').value=localStorage.getItem('imgkey_'+aip)||'';}
+  const iq=localStorage.getItem('imgQuality');
+  if(iq)document.getElementById('imgQuality').value=iq;
   const ts=localStorage.getItem('tempSet'),ls=localStorage.getItem('lenSet');
   if(ts)document.getElementById('tempSet').value=ts;
   if(ls)document.getElementById('lenSet').value=ls;
