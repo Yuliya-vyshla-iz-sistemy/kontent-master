@@ -1202,12 +1202,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <div class="upload-zone" id="logoZone" onclick="document.getElementById('logoInput').click()">
           <div id="logoZoneText">📎 Нажми чтобы загрузить логотип</div>
           <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="uploadAsset('logo',this)">
-        </div></div>
+        </div>
+        <button class="mini-btn" id="logoRemoveBtn" style="display:none;margin-top:6px" onclick="event.stopPropagation();removeAsset('logo')">🗑 Удалить логотип</button></div>
       <div class="form-group"><label class="form-label">Фото автора</label>
         <div class="upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
           <div id="photoZoneText">📎 Нажми чтобы загрузить фото</div>
           <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadAsset('photo',this)">
-        </div></div>
+        </div>
+        <button class="mini-btn" id="photoRemoveBtn" style="display:none;margin-top:6px" onclick="event.stopPropagation();removeAsset('photo')">🗑 Удалить фото</button></div>
     </div>
     <div class="form-group" style="margin-top:10px">
       <label class="form-label">Смещение фото (где обрезать) — <span id="photoOffsetVal">38</span>%</label>
@@ -3147,7 +3149,8 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
       ctx.restore();
     };
 
-    if(photoImg){
+    const isLastSlide=idx===total-1;
+    if(photoImg&&!isLastSlide){
       drawPolaroid(W-140,220,200,7,photoImg);
       drawLayerCard(W-160,H-190,190,60,-6,dark?c.terra:c.amber);
     } else {
@@ -3687,15 +3690,27 @@ function uploadAsset(type,input){
     const zone=document.getElementById(type+'Zone');
     zone.classList.add('has-file');
     document.getElementById(type+'ZoneText').innerHTML='✅ Загружено<img src="'+e.target.result+'" class="upload-preview">';
+    const rb=document.getElementById(type+'RemoveBtn');if(rb)rb.style.display='inline-flex';
     toast((type==='logo'?'Логотип':'Фото')+' сохранено навсегда ✓','ok');
     if(type==='photo')setTimeout(()=>updatePhotoPreview(S.photoOffset||38),200);
   };
   reader.readAsDataURL(file);
 }
+function removeAsset(type){
+  localStorage.removeItem('asset_'+type);
+  const zone=document.getElementById(type+'Zone');
+  zone.classList.remove('has-file');
+  document.getElementById(type+'ZoneText').innerHTML='📎 Нажми чтобы загрузить '+(type==='logo'?'логотип':'фото');
+  const rb=document.getElementById(type+'RemoveBtn');if(rb)rb.style.display='none';
+  const input=document.getElementById(type+'Input');if(input)input.value='';
+  toast((type==='logo'?'Логотип':'Фото')+' удалено','ok');
+  if(type==='photo')setTimeout(()=>updatePhotoPreview(S.photoOffset||38),200);
+}
 function loadAssets(){
   ['logo','photo'].forEach(t=>{
     const d=localStorage.getItem('asset_'+t);
-    if(d){const z=document.getElementById(t+'Zone');if(z){z.classList.add('has-file');document.getElementById(t+'ZoneText').innerHTML='✅ Загружено<img src="'+d+'" class="upload-preview">';}}
+    if(d){const z=document.getElementById(t+'Zone');if(z){z.classList.add('has-file');document.getElementById(t+'ZoneText').innerHTML='✅ Загружено<img src="'+d+'" class="upload-preview">';}
+      const rb=document.getElementById(t+'RemoveBtn');if(rb)rb.style.display='inline-flex';}
   });
 }
 
