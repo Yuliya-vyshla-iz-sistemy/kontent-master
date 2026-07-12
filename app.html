@@ -675,7 +675,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="tag" onclick="setSlideStyle('underline',this)">＿ Подчёркнутый</button>
         <button class="tag" onclick="setSlideStyle('dotgrid',this)">⋮⋮ Точки</button>
         <button class="tag" onclick="setSlideStyle('ribbon',this)">🎗 Лента</button>
-        <button class="tag" onclick="setSlideStyle('collage',this)">📎 Коллаж</button>
+        <button class="tag" onclick="setSlideStyle('layers',this)">🗞 Слои</button>
       </div></div>
     <div class="form-group"><label class="form-label">Объём текста на картинке слайда</label>
       <div class="tag-group" style="margin-bottom:0">
@@ -3112,25 +3112,48 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   } else if(style==='ribbon'){
     // ── ЛЕНТА: базовый фон; сама лента под заголовком рисуется ниже (нужны размеры текста) ──
     ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
-  } else if(style==='collage'){
-    // ── КОЛЛАЖ: тёплый фон + пунктирная рамка + имитация скотча — скрапбук-настроение ──
+  } else if(style==='layers'){
+    // ── СЛОИ: наслоенные карточки с тенью; если есть фото профиля — оно становится полароидом среди слоёв ──
     ctx.fillStyle=dark?'#2B2130':c.cream;ctx.fillRect(0,0,W,H);
     ctx.save();
-    ctx.strokeStyle=dark?'rgba(224,163,62,0.4)':'rgba(194,90,62,0.35)';
+    ctx.strokeStyle=dark?'rgba(224,163,62,0.35)':'rgba(194,90,62,0.3)';
     ctx.lineWidth=2;ctx.setLineDash([10,8]);
     ctx.strokeRect(34,34,W-68,H-68);
     ctx.restore();
-    // Крупные полоски скотча — тёплый полупрозрачный цвет + лёгкая текстурная полоса
-    const tapes=[[150,70,190,58,-7],[W-220,110,210,60,6],[110,H-130,200,58,4]];
-    tapes.forEach(([tx,ty,tw,th,rot])=>{
-      ctx.save();ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
-      ctx.fillStyle=dark?'rgba(224,163,62,0.5)':'rgba(194,90,62,0.4)';
+
+    const drawLayerCard=(tx,ty,tw,th,rot,fillColor)=>{
+      ctx.save();
+      ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
+      ctx.shadowColor='rgba(0,0,0,0.35)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
+      ctx.fillStyle=fillColor;
       ctx.fillRect(-tw/2,-th/2,tw,th);
-      // тонкая светлая полоса-блик для фактуры плёнки
-      ctx.fillStyle=dark?'rgba(245,239,230,0.18)':'rgba(255,255,255,0.35)';
-      ctx.fillRect(-tw/2,-th/2+th*0.62,tw,th*0.12);
       ctx.restore();
-    });
+    };
+    const drawPolaroid=(tx,ty,size,rot,img)=>{
+      const frameW=size,frameH=size*1.18,pad=size*0.08,photoSize=size-pad*2;
+      ctx.save();
+      ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
+      ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=20;ctx.shadowOffsetY=12;
+      ctx.fillStyle='#FBF7F0';
+      ctx.fillRect(-frameW/2,-frameH/2,frameW,frameH);
+      ctx.restore();
+      ctx.save();
+      ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
+      ctx.beginPath();ctx.rect(-frameW/2+pad,-frameH/2+pad,photoSize,photoSize);ctx.clip();
+      const sw=img.naturalWidth,sh=img.naturalHeight;
+      const scale=Math.max(photoSize/sw,photoSize/sh);
+      const dw=sw*scale,dh=sh*scale;
+      ctx.drawImage(img,-frameW/2+pad-(dw-photoSize)/2,-frameH/2+pad-(dh-photoSize)*0.35,dw,dh);
+      ctx.restore();
+    };
+
+    if(photoImg){
+      drawPolaroid(W-140,220,200,7,photoImg);
+      drawLayerCard(W-160,H-190,190,60,-6,dark?c.terra:c.amber);
+    } else {
+      drawLayerCard(W-150,220,200,64,-7,dark?c.terra:c.amber);
+      drawLayerCard(W-160,H-190,190,60,5,dark?c.amber:c.terra);
+    }
   }
 
   // ── ЛЕВАЯ ПОЛОСА ──
@@ -3387,7 +3410,7 @@ function loadImgAsync(src){return new Promise((res,rej)=>{if(!src){res(null);ret
 
 async function renderCanvasSlides(){
   if(!S.slidesData.length){toast('Сначала сгенерируй слайды','err');return;}
-  const styleNames={minimal:'однотонный',gradient:'градиент',decor:'с декором',premium:'премиальный',editorial:'редакционный',bold:'крупный блок',split:'диагональ',card:'карточка',corner:'угловой акцент',underline:'подчёркнутый',dotgrid:'точки',ribbon:'лента',collage:'коллаж'};
+  const styleNames={minimal:'однотонный',gradient:'градиент',decor:'с декором',premium:'премиальный',editorial:'редакционный',bold:'крупный блок',split:'диагональ',card:'карточка',corner:'угловой акцент',underline:'подчёркнутый',dotgrid:'точки',ribbon:'лента',layers:'слои'};
   const wrap=document.getElementById('canvasSlides');
   wrap.innerHTML='<div style="padding:12px;color:var(--text-muted);font-size:.82em">⏳ Рисую слайды (стиль: '+(styleNames[S.slideStyle]||S.slideStyle)+')...</div>';
   const logoData=localStorage.getItem('asset_logo');
