@@ -657,15 +657,24 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="form-row">
       <div class="form-group"><label class="form-label">Слайдов</label>
         <select class="form-select" id="slideN"><option value="5">5</option><option value="7" selected>7</option><option value="9">9</option><option value="12">12</option></select></div>
-      <div class="form-group"><label class="form-label">Стиль обложки <span style="color:var(--text-hint);font-weight:400;text-transform:none;letter-spacing:0">— скоро</span></label>
-        <select class="form-select" id="coverStyle" disabled title="В разработке: появится вместе с расширением типографских шаблонов обложек" style="opacity:.55;cursor:not-allowed"><option value="elegant">Элегантная</option><option value="humor">С юмором</option><option value="provoke">Провокация</option></select></div>
+      <div class="form-group"><label class="form-label">Тон обложки</label>
+        <select class="form-select" id="coverStyle" title="Меняет шрифт, регистр и контраст текста поверх выбранного шаблона фона"><option value="elegant">Элегантная</option><option value="humor">С юмором</option><option value="provoke">Провокация</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Стиль фона слайдов</label>
-      <div class="tag-group" style="margin-bottom:0">
+      <div class="tag-group" style="margin-bottom:0;flex-wrap:wrap">
         <button class="tag active" onclick="setSlideStyle('minimal',this)">⬛ Однотонный</button>
         <button class="tag" onclick="setSlideStyle('gradient',this)">🌅 Градиент</button>
         <button class="tag" onclick="setSlideStyle('decor',this)">✦ С декором</button>
         <button class="tag" onclick="setSlideStyle('premium',this)">💎 Премиальный</button>
+        <button class="tag" onclick="setSlideStyle('editorial',this)">📰 Редакционный</button>
+        <button class="tag" onclick="setSlideStyle('bold',this)">🟧 Крупный блок</button>
+        <button class="tag" onclick="setSlideStyle('split',this)">◢ Диагональ</button>
+        <button class="tag" onclick="setSlideStyle('card',this)">🗂 Карточка</button>
+        <button class="tag" onclick="setSlideStyle('corner',this)">◤ Угловой акцент</button>
+        <button class="tag" onclick="setSlideStyle('underline',this)">＿ Подчёркнутый</button>
+        <button class="tag" onclick="setSlideStyle('dotgrid',this)">⋮⋮ Точки</button>
+        <button class="tag" onclick="setSlideStyle('ribbon',this)">🎗 Лента</button>
+        <button class="tag" onclick="setSlideStyle('collage',this)">📎 Коллаж</button>
       </div></div>
     <div class="form-group"><label class="form-label">Объём текста на картинке слайда</label>
       <div class="tag-group" style="margin-bottom:0">
@@ -2979,6 +2988,14 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   const dark=idx===0||idx===total-1;
   const style=S.slideStyle||'minimal';
   const p=getProfile();
+  const tone=document.getElementById('coverStyle')?.value||'elegant';
+  const titleUpper=tone==='provoke';
+  const titleText=titleUpper?(slide.title||'').toUpperCase():(slide.title||'');
+  function titleFontStr(size){
+    if(tone==='humor')return '800 '+Math.round(size*1.05)+'px Manrope,sans-serif';
+    if(tone==='provoke')return '900 '+size+'px Manrope,sans-serif';
+    return 'bold '+size+'px Spectral,serif';
+  }
 
   // ── ФОН ──
   if(style==='minimal'){
@@ -3040,6 +3057,75 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
       ctx.fillStyle=dark?'rgba(255,255,255,0.018)':'rgba(0,0,0,0.012)';
       ctx.fillRect(gx,gy,gs,gs);
     }
+  } else if(style==='editorial'){
+    // ── РЕДАКЦИОННЫЙ: чистый фон + тонкие линии-рамки + огромный полупрозрачный номер фоном ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle=dark?'rgba(224,163,62,0.4)':'rgba(58,42,77,0.25)';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(60,140);ctx.lineTo(W-60,140);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(60,H-160);ctx.lineTo(W-60,H-160);ctx.stroke();
+    ctx.save();
+    ctx.font='800 420px Spectral,serif';
+    ctx.fillStyle=dark?'rgba(245,239,230,0.05)':'rgba(58,42,77,0.05)';
+    ctx.textAlign='right';
+    ctx.fillText(String(idx+1),W-20,H-40);
+    ctx.textAlign='left';
+    ctx.restore();
+  } else if(style==='bold'){
+    // ── КРУПНЫЙ БЛОК: плоский насыщенный цвет, без градиента — постерная подача ──
+    ctx.fillStyle=dark?c.terra:c.amber;ctx.fillRect(0,0,W,H);
+    const grd=ctx.createLinearGradient(0,H*0.6,0,H);
+    grd.addColorStop(0,'rgba(0,0,0,0)');
+    grd.addColorStop(1,dark?'rgba(0,0,0,0.25)':'rgba(0,0,0,0.12)');
+    ctx.fillStyle=grd;ctx.fillRect(0,H*0.6,W,H*0.4);
+  } else if(style==='split'){
+    // ── ДИАГОНАЛЬ: фон разделён по диагонали двумя фирменными тонами ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+    ctx.save();
+    ctx.beginPath();ctx.moveTo(W*0.42,0);ctx.lineTo(W,0);ctx.lineTo(W,H);ctx.lineTo(W*0.58,H);ctx.closePath();ctx.clip();
+    ctx.fillStyle=dark?c.terra:(c.greige||'#D7CABA');
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
+    ctx.strokeStyle=dark?c.amber:c.terra;ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(W*0.42,0);ctx.lineTo(W*0.58,H);ctx.stroke();
+  } else if(style==='card'){
+    // ── КАРТОЧКА: базовый фон; сама карточка под текстом рисуется ниже (нужны размеры текста) ──
+    ctx.fillStyle=dark?'#1A0E2E':(c.greige||'#D7CABA');ctx.fillRect(0,0,W,H);
+  } else if(style==='corner'){
+    // ── УГЛОВОЙ АКЦЕНТ: чистый фон + крупная геометрическая форма в углу ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+    ctx.beginPath();ctx.moveTo(W,0);ctx.lineTo(W,H*0.5);ctx.lineTo(W*0.55,0);ctx.closePath();
+    ctx.fillStyle=dark?c.terra:c.amber;ctx.fill();
+    ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W*0.35,H);ctx.lineTo(0,H*0.72);ctx.closePath();
+    ctx.fillStyle=dark?'rgba(224,163,62,0.18)':'rgba(194,90,62,0.12)';ctx.fill();
+  } else if(style==='underline'){
+    // ── ПОДЧЁРКНУТЫЙ: минимальный фон; подчёркивания под строками заголовка рисуются ниже ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+  } else if(style==='dotgrid'){
+    // ── ТОЧКИ: базовый фон + равномерная точечная сетка ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=dark?'rgba(245,239,230,0.09)':'rgba(58,42,77,0.07)';
+    for(let gx=40;gx<W;gx+=44){
+      for(let gy=40;gy<H;gy+=44){ctx.beginPath();ctx.arc(gx,gy,2.2,0,Math.PI*2);ctx.fill();}
+    }
+  } else if(style==='ribbon'){
+    // ── ЛЕНТА: базовый фон; сама лента под заголовком рисуется ниже (нужны размеры текста) ──
+    ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
+  } else if(style==='collage'){
+    // ── КОЛЛАЖ: тёплый фон + пунктирная рамка + имитация скотча — скрапбук-настроение ──
+    ctx.fillStyle=dark?'#2B2130':c.cream;ctx.fillRect(0,0,W,H);
+    ctx.save();
+    ctx.strokeStyle=dark?'rgba(224,163,62,0.4)':'rgba(194,90,62,0.35)';
+    ctx.lineWidth=2;ctx.setLineDash([10,8]);
+    ctx.strokeRect(34,34,W-68,H-68);
+    ctx.restore();
+    const tapes=[[130,60,140,42,-8],[W-190,90,150,44,6],[90,H-110,150,44,4]];
+    tapes.forEach(([tx,ty,tw,th,rot])=>{
+      ctx.save();ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
+      ctx.fillStyle=dark?'rgba(245,239,230,0.14)':'rgba(194,90,62,0.14)';
+      ctx.fillRect(-tw/2,-th/2,tw,th);
+      ctx.restore();
+    });
   }
 
   // ── ЛЕВАЯ ПОЛОСА ──
@@ -3070,8 +3156,8 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   if (headlineMode) {
     // Только заголовок — крупно, без тела
     for (let attempt = 0; attempt < 12; attempt++) {
-      ctx.font = 'bold ' + titleSize + 'px Spectral,serif';
-      titleLines = wrapText(ctx, slide.title, W - 140);
+      ctx.font = titleFontStr(titleSize);
+      titleLines = wrapText(ctx, titleText, W - 140);
       titleLH = Math.round(titleSize * 1.23);
       totalH = titleLines.length * titleLH;
       if (totalH <= availH || titleSize <= 38) break;
@@ -3081,8 +3167,8 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   } else {
     // Полный текст — заголовок + тело, подбираем оба
     for (let attempt = 0; attempt < 14; attempt++) {
-      ctx.font = 'bold ' + titleSize + 'px Spectral,serif';
-      titleLines = wrapText(ctx, slide.title, W - 140);
+      ctx.font = titleFontStr(titleSize);
+      titleLines = wrapText(ctx, titleText, W - 140);
       ctx.font = '400 ' + bodySize + 'px Manrope,sans-serif';
       bodyLines = wrapText(ctx, slide.body, W - 140);
 
@@ -3106,10 +3192,54 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
 
   let y = Math.max(topLimit, (H - totalH) / 2);
 
+  // ── ФОНОВЫЕ ПОДЛОЖКИ ПОД ТЕКСТОМ (нужны точные размеры текста) ──
+  if(style==='card'){
+    const padY=30,rx=40,ry=y-titleSize*0.85-padY,rw=W-80,rh=totalH+padY*2,rad=20;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(rx+rad,ry);
+    ctx.arcTo(rx+rw,ry,rx+rw,ry+rh,rad);
+    ctx.arcTo(rx+rw,ry+rh,rx,ry+rh,rad);
+    ctx.arcTo(rx,ry+rh,rx,ry,rad);
+    ctx.arcTo(rx,ry,rx+rw,ry,rad);
+    ctx.closePath();
+    ctx.fillStyle=dark?'rgba(245,239,230,0.08)':'rgba(255,255,255,0.75)';
+    ctx.fill();
+    ctx.strokeStyle=dark?'rgba(224,163,62,0.4)':'rgba(58,42,77,0.15)';
+    ctx.lineWidth=1.5;ctx.stroke();
+    ctx.restore();
+  }
+  if(style==='ribbon'&&titleLines.length){
+    ctx.save();
+    ctx.font=titleFontStr(titleSize);
+    let ry=y-titleSize*0.85;
+    titleLines.forEach(line=>{
+      const w=ctx.measureText(line).width;
+      ctx.fillStyle=dark?'rgba(224,163,62,0.28)':'rgba(194,90,62,0.18)';
+      ctx.fillRect(50,ry,w+20,titleLH-6);
+      ry+=titleLH;
+    });
+    ctx.restore();
+  }
+
   // ── ЗАГОЛОВОК ──
   ctx.fillStyle=dark?c.cream:c.eggplant;
-  ctx.font='bold '+titleSize+'px Spectral,serif';
-  for(const line of titleLines){ctx.fillText(line,60,y);y+=titleLH;}
+  ctx.font=titleFontStr(titleSize);
+  if(tone==='provoke')ctx.letterSpacing='-1px';
+  else if(tone==='humor')ctx.letterSpacing='0.5px';
+  else ctx.letterSpacing='0px';
+  for(const line of titleLines){
+    ctx.fillText(line,60,y);
+    if(style==='underline'){
+      const w=ctx.measureText(line).width;
+      const uc=ctx.fillStyle;
+      ctx.fillStyle=dark?c.amber:c.terra;
+      ctx.fillRect(60,y+10,w,6);
+      ctx.fillStyle=uc;
+    }
+    y+=titleLH;
+  }
+  ctx.letterSpacing='0px';
 
   // ── ТЕЛО — выводим ПОЛНОСТЬЮ, без обрезки ──
   if(bodyLines.length){
@@ -3244,7 +3374,7 @@ function loadImgAsync(src){return new Promise((res,rej)=>{if(!src){res(null);ret
 
 async function renderCanvasSlides(){
   if(!S.slidesData.length){toast('Сначала сгенерируй слайды','err');return;}
-  const styleNames={minimal:'однотонный',gradient:'градиент',decor:'с декором',premium:'премиальный'};
+  const styleNames={minimal:'однотонный',gradient:'градиент',decor:'с декором',premium:'премиальный',editorial:'редакционный',bold:'крупный блок',split:'диагональ',card:'карточка',corner:'угловой акцент',underline:'подчёркнутый',dotgrid:'точки',ribbon:'лента',collage:'коллаж'};
   const wrap=document.getElementById('canvasSlides');
   wrap.innerHTML='<div style="padding:12px;color:var(--text-muted);font-size:.82em">⏳ Рисую слайды (стиль: '+(styleNames[S.slideStyle]||S.slideStyle)+')...</div>';
   const logoData=localStorage.getItem('asset_logo');
