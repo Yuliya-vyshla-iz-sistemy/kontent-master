@@ -618,7 +618,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <span id="posterUsePhotoLabel">Использовать моё фото как референс (AI нарисует постер с тобой)</span>
       </label>
       <div id="posterPhotoPicker" style="display:none;gap:8px;margin-top:10px;margin-left:24px;flex-wrap:wrap"></div>
-      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Работает только с Gemini Image AI. Выбери его в Настройках, если ещё не выбран.</div>
+      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Кликни на фото, чтобы выбрать/снять — можно несколько сразу. Работает только с Gemini Image AI. Выбери его в Настройках, если ещё не выбран.</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px">
@@ -657,8 +657,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="form-row">
       <div class="form-group"><label class="form-label">Слайдов</label>
         <select class="form-select" id="slideN"><option value="5">5</option><option value="7" selected>7</option><option value="9">9</option><option value="12">12</option></select></div>
-      <div class="form-group"><label class="form-label">Стиль обложки</label>
-        <select class="form-select" id="coverStyle"><option value="elegant">Элегантная</option><option value="humor">С юмором</option><option value="provoke">Провокация</option></select></div>
+      <div class="form-group"><label class="form-label">Стиль обложки <span style="color:var(--text-hint);font-weight:400;text-transform:none;letter-spacing:0">— скоро</span></label>
+        <select class="form-select" id="coverStyle" disabled title="В разработке: появится вместе с расширением типографских шаблонов обложек" style="opacity:.55;cursor:not-allowed"><option value="elegant">Элегантная</option><option value="humor">С юмором</option><option value="provoke">Провокация</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Стиль фона слайдов</label>
       <div class="tag-group" style="margin-bottom:0">
@@ -755,7 +755,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <span id="coverUsePhotoLabel">Использовать моё фото как референс (AI нарисует обложку с тобой)</span>
       </label>
       <div id="coverPhotoPicker" style="display:none;gap:8px;margin-top:10px;margin-left:24px;flex-wrap:wrap"></div>
-      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Работает только с Gemini Image AI.</div>
+      <div style="font-size:.72em;color:var(--text-hint);margin-top:4px;margin-left:24px">Кликни на фото, чтобы выбрать/снять — можно несколько сразу. Работает только с Gemini Image AI.</div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px">
@@ -2129,7 +2129,7 @@ async function callImageAI(prompt,refPhoto){
   // Gemini Image — Nano Banana 2 / Pro
   if(prov==='gemini_img'){
     const parts=[];
-    if(refPhoto)parts.push({inlineData:{mimeType:refPhoto.mime,data:refPhoto.data}});
+    [].concat(refPhoto||[]).forEach(rp=>{if(rp)parts.push({inlineData:{mimeType:rp.mime,data:rp.data}});});
     parts.push({text:prompt});
     const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiImgModel()+':generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -2569,18 +2569,19 @@ function closePosterModal() {
   document.body.style.overflow='';
 }
 
-// Референс-фото для AI-обложки/постера: либо профильное фото, либо одно из загруженных в Прогрев
-let refPhotoChoice={source:'profile',idx:0};
+// Референс-фото для AI-обложки/постера: можно выбрать сразу несколько — профиль + фото из Прогрева
+let refPhotoChoices=[]; // массив {source:'profile'|'warmup', idx}
 
 function getWarmupPhotoRef(idx){
   const ph=warmupPhotos[idx];
   return ph?{mime:ph.mime,data:ph.b64}:null;
 }
 
-function pickRefPhoto(source,idx,el,pickerId){
-  refPhotoChoice={source,idx};
-  document.querySelectorAll('#'+pickerId+' .photo-pick').forEach(n=>n.style.borderColor='transparent');
-  if(el)el.style.borderColor='var(--terra)';
+function toggleRefPhoto(source,idx,el){
+  const key=source+':'+idx;
+  const pos=refPhotoChoices.findIndex(c=>c.source+':'+c.idx===key);
+  if(pos>=0){refPhotoChoices.splice(pos,1);el.style.borderColor='transparent';el.style.opacity='.55';}
+  else{refPhotoChoices.push({source,idx});el.style.borderColor='var(--terra)';el.style.opacity='1';}
 }
 
 function buildPhotoPicker(pickerId,checkboxLabelId,defaultLabel){
@@ -2591,35 +2592,45 @@ function buildPhotoPicker(pickerId,checkboxLabelId,defaultLabel){
   const hasProfile=!!localStorage.getItem('asset_photo');
   if(!hasWarmup&&!hasProfile)return false;
 
-  if(hasWarmup){
-    label.textContent='Использовать фото (AI нарисует с тобой) — выбери какое:';
-    warmupPhotos.forEach((ph,i)=>{
-      const img=document.createElement('img');
-      img.src='data:'+ph.mime+';base64,'+ph.b64;
-      img.className='photo-pick';
-      img.style.cssText='width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid '+(i===0?'var(--terra)':'transparent');
-      img.onclick=()=>pickRefPhoto('warmup',i,img,pickerId);
-      picker.appendChild(img);
-    });
-    if(hasProfile){
-      const img=document.createElement('img');
-      img.src=localStorage.getItem('asset_photo');
-      img.className='photo-pick';
-      img.title='Фото профиля';
-      img.style.cssText='width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px dashed rgba(224,163,62,.5)';
-      img.onclick=()=>pickRefPhoto('profile',0,img,pickerId);
-      picker.appendChild(img);
-    }
-    refPhotoChoice={source:'warmup',idx:0};
+  if(hasWarmup&&hasProfile){
+    label.textContent='Использовать фото (можно выбрать несколько — например, себя + фото места):';
+  } else if(hasWarmup){
+    label.textContent='Использовать фото из Прогрева как референс (AI нарисует по мотивам):';
   } else {
     label.textContent=defaultLabel;
-    refPhotoChoice={source:'profile',idx:0};
+  }
+
+  refPhotoChoices=[];
+  warmupPhotos.forEach((ph,i)=>{
+    const img=document.createElement('img');
+    img.src='data:'+ph.mime+';base64,'+ph.b64;
+    img.className='photo-pick';
+    img.title='Фото из Прогрева';
+    const selected=i===0; // по умолчанию первое фото прогрева выбрано
+    img.style.cssText='width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:opacity .15s;border:2px solid '+(selected?'var(--terra)':'transparent')+';opacity:'+(selected?'1':'.55');
+    img.onclick=()=>toggleRefPhoto('warmup',i,img);
+    picker.appendChild(img);
+    if(selected)refPhotoChoices.push({source:'warmup',idx:i});
+  });
+  if(hasProfile){
+    const img=document.createElement('img');
+    img.src=localStorage.getItem('asset_photo');
+    img.className='photo-pick';
+    img.title='Фото профиля (ты)';
+    const selected=!hasWarmup; // если фото прогрева нет — по умолчанию выбрано фото профиля
+    img.style.cssText='width:52px;height:52px;object-fit:cover;border-radius:8px;cursor:pointer;transition:opacity .15s;border:2px dashed rgba(224,163,62,.7);opacity:'+(selected?'1':'.55');
+    img.onclick=()=>toggleRefPhoto('profile',0,img);
+    picker.appendChild(img);
+    if(selected)refPhotoChoices.push({source:'profile',idx:0});
   }
   return true;
 }
 
+// Возвращает массив {mime,data} для всех выбранных референс-фото
 function resolvePhotoRef(){
-  return refPhotoChoice.source==='warmup' ? getWarmupPhotoRef(refPhotoChoice.idx) : getAuthorPhotoRef();
+  return refPhotoChoices
+    .map(c=>c.source==='warmup'?getWarmupPhotoRef(c.idx):getAuthorPhotoRef())
+    .filter(Boolean);
 }
 
 // Парсит сохранённое фото автора (data URL) в {mime,data} для передачи как референс в Gemini
@@ -2641,11 +2652,11 @@ async function genPostPoster() {
   const p = getProfile();
   const styleDesc = VIS_STYLES[posterVisStyle] || VIS_STYLES.photorealism;
 
-  let refPhoto=null;
+  let refPhoto=[];
   if(usePhoto){
     if(getActiveImgProv()!=='gemini_img'){toast('Фото-референс работает только с Gemini Image AI — выбери его в Настройках','err');load(btn,false);return;}
     refPhoto=resolvePhotoRef();
-    if(!refPhoto){toast('Фото не найдено','err');load(btn,false);return;}
+    if(!refPhoto.length){toast('Выбери хотя бы одно фото','err');load(btn,false);return;}
   }
 
   // Берём первые 120 символов поста как суть
@@ -2653,7 +2664,8 @@ async function genPostPoster() {
 
   let prompt = `Social media visual poster, ${format} format. Style: ${styleDesc}. `;
   prompt += `Post theme: "${essence}". `;
-  if(refPhoto) prompt += `Use the provided reference photo to depict the same person accurately in the scene. `;
+  if(refPhoto.length>1) prompt += `Multiple reference photos provided: use them together — depict the same person accurately, placed in a scene inspired by the other reference photo(s). `;
+  else if(refPhoto.length===1) prompt += `Use the provided reference photo to depict the same person/scene accurately. `;
   else if(p.name) prompt += `Author: ${p.name}. `;
   prompt += `Brand colors: deep eggplant #3A2A4D, terracotta #C25A3E, amber #E0A33E. `;
   prompt += `Professional, clean, Instagram-ready. No text overlay. `;
@@ -2719,16 +2731,17 @@ async function genAiCoverStyled() {
   const styleDesc = VIS_STYLES[coverVisStyle] || VIS_STYLES.photorealism;
   const p = getProfile();
 
-  let refPhoto=null;
+  let refPhoto=[];
   if(usePhoto){
     if(getActiveImgProv()!=='gemini_img'){toast('Фото-референс работает только с Gemini Image AI — выбери его в Настройках','err');load(btn,false);return;}
     refPhoto=resolvePhotoRef();
-    if(!refPhoto){toast('Фото не найдено','err');load(btn,false);return;}
+    if(!refPhoto.length){toast('Выбери хотя бы одно фото','err');load(btn,false);return;}
   }
 
   let prompt = `Social media carousel cover, 9:16 vertical format. Style: ${styleDesc}. `;
   prompt += `Title text: "${S.selHook||'Обложка'}". `;
-  if(refPhoto) prompt += `Use the provided reference photo to depict the same person accurately in the scene. `;
+  if(refPhoto.length>1) prompt += `Multiple reference photos provided: use them together — depict the same person accurately, placed in a scene inspired by the other reference photo(s). `;
+  else if(refPhoto.length===1) prompt += `Use the provided reference photo to depict the same person/scene accurately. `;
   else if(p.name) prompt += `Author: ${p.name}. `;
   prompt += `Brand colors: #3A2A4D, #C25A3E, #E0A33E. Professional, clean. `;
   if(hint) prompt += hint + '. ';
@@ -2768,7 +2781,7 @@ async function callImageAIWithFormat(prompt, format, refPhoto) {
 
   if(prov==='gemini_img') {
     const parts=[];
-    if(refPhoto)parts.push({inlineData:{mimeType:refPhoto.mime,data:refPhoto.data}});
+    [].concat(refPhoto||[]).forEach(rp=>{if(rp)parts.push({inlineData:{mimeType:rp.mime,data:rp.data}});});
     parts.push({text:prompt});
     const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiImgModel()+':generateContent?key='+k,{
       method:'POST',headers:{'Content-Type':'application/json'},
