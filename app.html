@@ -658,7 +658,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="form-group"><label class="form-label">Слайдов</label>
         <select class="form-select" id="slideN"><option value="5">5</option><option value="7" selected>7</option><option value="9">9</option><option value="12">12</option></select></div>
       <div class="form-group"><label class="form-label">Тон обложки</label>
-        <select class="form-select" id="coverStyle" title="Меняет шрифт, регистр и контраст текста поверх выбранного шаблона фона"><option value="elegant">Элегантная</option><option value="humor">С юмором</option><option value="provoke">Провокация</option></select></div>
+        <select class="form-select" id="coverStyle" title="Меняет шрифт, регистр и контраст текста поверх выбранного шаблона фона"><option value="elegant">Классика</option><option value="humor">Крупно</option><option value="provoke">КАПС</option></select>
+        <div style="margin-top:6px;font-size:.72em;color:var(--text-hint)">После смены нажми «Сделать картинки слайдов» ещё раз — иначе старые картинки не обновятся</div></div>
     </div>
     <div class="form-group"><label class="form-label">Стиль фона слайдов</label>
       <div class="tag-group" style="margin-bottom:0;flex-wrap:wrap">
@@ -3104,9 +3105,9 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
   } else if(style==='dotgrid'){
     // ── ТОЧКИ: базовый фон + равномерная точечная сетка ──
     ctx.fillStyle=dark?c.eggplant:c.cream;ctx.fillRect(0,0,W,H);
-    ctx.fillStyle=dark?'rgba(245,239,230,0.09)':'rgba(58,42,77,0.07)';
-    for(let gx=40;gx<W;gx+=44){
-      for(let gy=40;gy<H;gy+=44){ctx.beginPath();ctx.arc(gx,gy,2.2,0,Math.PI*2);ctx.fill();}
+    ctx.fillStyle=dark?'rgba(224,163,62,0.32)':'rgba(194,90,62,0.22)';
+    for(let gx=44;gx<W;gx+=52){
+      for(let gy=44;gy<H;gy+=52){ctx.beginPath();ctx.arc(gx,gy,3.4,0,Math.PI*2);ctx.fill();}
     }
   } else if(style==='ribbon'){
     // ── ЛЕНТА: базовый фон; сама лента под заголовком рисуется ниже (нужны размеры текста) ──
@@ -3119,11 +3120,15 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
     ctx.lineWidth=2;ctx.setLineDash([10,8]);
     ctx.strokeRect(34,34,W-68,H-68);
     ctx.restore();
-    const tapes=[[130,60,140,42,-8],[W-190,90,150,44,6],[90,H-110,150,44,4]];
+    // Крупные полоски скотча — тёплый полупрозрачный цвет + лёгкая текстурная полоса
+    const tapes=[[150,70,190,58,-7],[W-220,110,210,60,6],[110,H-130,200,58,4]];
     tapes.forEach(([tx,ty,tw,th,rot])=>{
       ctx.save();ctx.translate(tx,ty);ctx.rotate(rot*Math.PI/180);
-      ctx.fillStyle=dark?'rgba(245,239,230,0.14)':'rgba(194,90,62,0.14)';
+      ctx.fillStyle=dark?'rgba(224,163,62,0.5)':'rgba(194,90,62,0.4)';
       ctx.fillRect(-tw/2,-th/2,tw,th);
+      // тонкая светлая полоса-блик для фактуры плёнки
+      ctx.fillStyle=dark?'rgba(245,239,230,0.18)':'rgba(255,255,255,0.35)';
+      ctx.fillRect(-tw/2,-th/2+th*0.62,tw,th*0.12);
       ctx.restore();
     });
   }
@@ -3213,10 +3218,18 @@ function drawSlide(canvas,slide,idx,total,logoImg,photoImg){
     ctx.save();
     ctx.font=titleFontStr(titleSize);
     let ry=y-titleSize*0.85;
+    const rh=titleLH-6,rad=Math.min(10,rh/2);
     titleLines.forEach(line=>{
-      const w=ctx.measureText(line).width;
-      ctx.fillStyle=dark?'rgba(224,163,62,0.28)':'rgba(194,90,62,0.18)';
-      ctx.fillRect(50,ry,w+20,titleLH-6);
+      const w=ctx.measureText(line).width,rw=w+24,rx=50;
+      ctx.beginPath();
+      ctx.moveTo(rx+rad,ry);
+      ctx.arcTo(rx+rw,ry,rx+rw,ry+rh,rad);
+      ctx.arcTo(rx+rw,ry+rh,rx,ry+rh,rad);
+      ctx.arcTo(rx,ry+rh,rx,ry,rad);
+      ctx.arcTo(rx,ry,rx+rw,ry,rad);
+      ctx.closePath();
+      ctx.fillStyle=dark?'rgba(224,163,62,0.38)':'rgba(194,90,62,0.22)';
+      ctx.fill();
       ry+=titleLH;
     });
     ctx.restore();
