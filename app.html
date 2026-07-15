@@ -545,7 +545,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
   </div>
   <div class="card" id="postResult" style="display:none">
     <div class="card-title">Результат</div>
-    <div class="result-box" id="postText"></div>
+    <div class="result-box" id="postText" contenteditable="true" style="outline:none"></div>
+    <div style="font-size:.72em;color:var(--text-hint);margin-top:4px">✏️ Можно кликнуть и поправить текст прямо здесь</div>
     <div class="result-actions">
       <button class="btn btn-secondary" onclick="cp('postText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
       <button class="btn btn-secondary" onclick="genPost()">🔄 Ещё вариант</button>
@@ -855,7 +856,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
       <div class="form-group"><label class="form-label">Длина</label>
         <select class="form-select" id="reelsLen"><option value="15">15 секунд</option><option value="30" selected>30 секунд</option><option value="60">60 секунд</option></select></div>
       <div class="form-group"><label class="form-label">Платформа</label>
-        <select class="form-select" id="reelsPlatform"><option value="reels">Reels / Max</option><option value="vk">VK Клипы</option><option value="shorts">YouTube Shorts</option></select></div>
+        <select class="form-select" id="reelsPlatform"><option value="reels">Reels / Max</option><option value="vk">VK Клипы</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Структура</label>
       <div class="tag-group">
@@ -873,6 +874,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="result-box" id="reelsText" style="min-height:160px"></div>
     <div class="result-actions">
       <button class="btn btn-secondary" onclick="cp('reelsText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
+      <button class="btn btn-secondary" onclick="genReels()">🔄 Ещё вариант</button>
     </div>
   </div>
 </div>
@@ -899,12 +901,13 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
         <button class="ptab" onclick="setPt('ig',this)">Max</button>
       </div></div>
     <div class="form-group"><label class="form-label">Формат на выходе</label>
-      <select class="form-select" id="rwOut"><option value="single">Один пост</option><option value="series3">Серия из 3 постов</option><option value="series5">Серия из 5 постов</option><option value="carousel">Текст для карусели</option></select></div>
+      <select class="form-select" id="rwOut"><option value="single">Один пост</option><option value="series3">Серия из 3 постов</option><option value="series5">Серия из 5 постов</option><option value="carousel">Текст для карусели</option><option value="interview_qa">Интервью (вопрос-ответ)</option></select></div>
     <button class="btn btn-primary" id="btnRw" onclick="doRw()"><span class="btn-text">✦ Переработать</span><div class="spinner"></div></button>
   </div>
   <div class="card" id="rwResult" style="display:none">
     <div class="card-title">Результат</div>
-    <div class="result-box" id="rwText"></div>
+    <div class="result-box" id="rwText" contenteditable="true" style="outline:none"></div>
+    <div style="font-size:.72em;color:var(--text-hint);margin-top:4px">✏️ Можно кликнуть и поправить текст прямо здесь</div>
     <div class="result-actions">
       <button class="btn btn-secondary" onclick="cp('rwText')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
     </div>
@@ -969,6 +972,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text-main);mi
     <div class="card-title">План на неделю</div>
     <div id="planHtml" style="font-size:.86em;line-height:1.75;color:var(--text-main)"></div>
     <div class="result-actions" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="genPlan()">🔄 Сгенерировать ещё раз</button>
       <button class="btn btn-secondary" onclick="cp('planHtml')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg> Скопировать</button>
       <a href="https://postmypost.io/" target="_blank" class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('planHtml').innerText)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> SMMplanner</a>
     </div>
@@ -3515,7 +3519,7 @@ async function genReels(){
   const topic=document.getElementById('reelsTopic').value.trim();if(!topic){toast('Введи тему','err');return;}
   const btn=document.getElementById('btnReels');load(btn,true);
   const len=document.getElementById('reelsLen').value,pl=document.getElementById('reelsPlatform').value;
-  const pn={reels:'Instagram Reels',vk:'VK Клипы',shorts:'YouTube Shorts'};
+  const pn={reels:'Instagram Reels',vk:'VK Клипы'};
   const st={twist:'Прыжок-разворот (неожиданный поворот в конце)',pov:'POV-история от первого лица',pain:'Боль→Решение→Результат',list:'3 совета/ошибки',story:'Сторителлинг с инсайтом',myth:'Разоблачение мифа'};
   const prompt='Напиши сценарий для '+pn[pl]+' длиной '+len+' секунд.\nТема: "'+topic+'". Структура: '+st[S.reelsStruct]+'.\n\nФормат:\n🎬 ХУК (0-3 сек): [текст который остановит пролистывание]\n📝 РАСКАДРОВКА:\n[секунды] — [что происходит в кадре]\n🎤 ТЕКСТ ДЛЯ ОЗВУЧКИ:\n[полный текст для записи голосом]\n💬 ТЕКСТ НА ЭКРАН:\n[короткие подписи которые появляются на видео]\n📄 ОПИСАНИЕ ПОД ВИДЕО:\n[текст для публикации]\n#️⃣ ХЭШТЕГИ: [5-7 штук]\n\nТолько сценарий, без вводных слов.';
   try{const r=await callAI(prompt);document.getElementById('reelsText').textContent=r;document.getElementById('reelsResult').style.display='block';addHist('reels',topic,r);toast('Сценарий готов ✓','ok');}
@@ -3528,11 +3532,16 @@ async function doRw(){
   if(!kmGate('gen')) return;
   const input=document.getElementById('rwInput').value.trim();if(!input){toast('Вставь текст','err');return;}
   const btn=document.getElementById('btnRw');load(btn,true);
-  const rm={transcription:'транскрибацию',interview:'интервью',shorten:'текст (сократи)',strengthen:'текст (усиль)',reframe:'текст (рефрейминг)'};
-  const on={single:'один пост',series3:'серию из 3 постов',series5:'серию из 5 постов',carousel:'текст для карусели'};
+  // Тип исходника — что подано на вход (влияет только на то, как AI ЧИТАЕТ текст)
+  const sourceType={transcription:'Это сырая, неразобранная транскрибация — расшифровка речи, возможны оговорки и повторы.',interview:'Это транскрибация интервью — реплики нескольких людей вперемешку, выдели мысли автора.'};
+  // Действие — что реально нужно СДЕЛАТЬ с текстом (конкретная инструкция, не общая фраза)
+  const action={shorten:'Сократи текст минимум вдвое: оставь только главную мысль и один самый сильный пример, убери всё второстепенное и повторы.',strengthen:'Усиль текст: замени слабые глаголы на яркие, обостри эмоцию, сделай первую и последнюю фразу сильнее. Не растягивай объём — усиливай, а не дополняй.',reframe:'Полностью перепиши текст своими словами с другой структурой подачи: смени порядок мыслей, зайди с другого угла или другого примера. Это не замена отдельных слов, а пересборка текста заново с тем же смыслом.'};
+  const on={single:'один пост',series3:'серию из 3 постов',series5:'серию из 5 постов',carousel:'текст для карусели',interview_qa:'формат интервью — чередуй "ВОПРОС: " и "ОТВЕТ: ", минимум 4 пары; вопросы придумай сам органично по смыслу текста, каждый ответ — от лица автора текста'};
   const pn={vk:'ВКонтакте',tg:'Telegram',ig:'Max'};
   const out=document.getElementById('rwOut').value;
-  try{const r=await callAI('Это '+rm[S.rwMode]+'. Переработай в '+on[out]+' для '+pn[S.platform]+'. Сохрани смысл и личную историю, сделай живым.\n\nТолько результат, без предисловия.\n\n'+input);document.getElementById('rwText').textContent=r;document.getElementById('rwResult').style.display='block';addHist('rewrite',input.slice(0,60)+'...',r);toast('Готово ✓','ok');}
+  const isSourceType=['transcription','interview'].includes(S.rwMode);
+  const leadInstruction=isSourceType?sourceType[S.rwMode]:action[S.rwMode];
+  try{const r=await callAI(leadInstruction+' Переработай в '+on[out]+' для '+pn[S.platform]+'. Сохрани смысл и личную историю, сделай живым.\n\nТолько результат, без предисловия.\n\n'+input);document.getElementById('rwText').textContent=r;document.getElementById('rwResult').style.display='block';addHist('rewrite',input.slice(0,60)+'...',r);toast('Готово ✓','ok');}
   catch(e){toast('Ошибка: '+e.message,'err');}
   finally{load(btn,false);}
 }
